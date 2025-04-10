@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_color"
+    tools:context=".HomeActaivity">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <EditText
+                    android:id="@+id/searchText"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:background="@drawable/edit_background"
+                    android:inputType="text"
+                    android:drawableStart="@drawable/search"
+                    android:layout_margin="16dp"
+                    android:drawablePadding="8dp"
+                    android:padding="12dp"
+                    android:drawableEnd="@drawable/microphone"
+                    android:hint="Search Movie..."
+                    android:textColorHint="@color/white"/>
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

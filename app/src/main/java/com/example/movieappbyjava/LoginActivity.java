@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity {
     TextView registerNow;
+    Button btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,14 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
         registerNow = findViewById(R.id.registerNow);
+        btn = findViewById(R.id.button2);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, HomeActaivity.class);
+                startActivity(intent);
+            }
+        });
         registerNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
