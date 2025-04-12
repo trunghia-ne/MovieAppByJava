@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,35 +8,71 @@
     android:background="@color/main_color"
     tools:context=".HomeActaivity">
 
-        <ScrollView
+    <!-- Nội dung cuộn -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:layout_marginBottom="80dp"> <!-- chừa chỗ cho menu -->
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Thanh tìm kiếm -->
+            <EditText
+                android:id="@+id/searchText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:layout_height="50dp"
+                android:ems="10"
+                android:background="@drawable/edit_background"
+                android:inputType="text"
+                android:drawableStart="@drawable/search"
+                android:layout_margin="16dp"
+                android:drawablePadding="8dp"
+                android:padding="12dp"
+                android:drawableEnd="@drawable/microphone"
+                android:hint="Search Movie..."
+                android:textColorHint="@color/white" />
 
-                <EditText
-                    android:id="@+id/searchText"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:ems="10"
-                    android:background="@drawable/edit_background"
-                    android:inputType="text"
-                    android:drawableStart="@drawable/search"
-                    android:layout_margin="16dp"
-                    android:drawablePadding="8dp"
-                    android:padding="12dp"
-                    android:drawableEnd="@drawable/microphone"
-                    android:hint="Search Movie..."
-                    android:textColorHint="@color/white"/>
-
-                <androidx.viewpager2.widget.ViewPager2
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
-        </ScrollView>
+            <!-- ViewPager hiển thị banner/phim -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+        </LinearLayout>
+    </ScrollView>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:background="#1A1725" />
+
+    <!-- Bottom Navigation View -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:elevation="8dp"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/color_selector"
+        app:itemTextColor="@color/color_selector"
+        android:background="@drawable/bg_bottom_nav_inline" />
+
+    <!-- FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="35dp"
+        android:src="@android:drawable/ic_media_play"
+        app:backgroundTint="#FF6D00"
+        app:tint="@android:color/white"
+        app:elevation="8dp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
