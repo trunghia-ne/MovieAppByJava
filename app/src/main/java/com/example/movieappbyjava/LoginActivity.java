@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity {
     TextView registerNow;
-    Button btn;
+    Button loginBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +26,18 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        registerNow = findViewById(R.id.registerNow);
-        btn = findViewById(R.id.button2);
-        btn.setOnClickListener(new View.OnClickListener() {
+
+        loginBtn = findViewById(R.id.loginBtn);
+        loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, HomeActaivity.class);
                 startActivity(intent);
             }
         });
-        registerNow.setOnClickListener(new View.OnClickListener() {
+
+        TextView signUpText = findViewById(R.id.signUpText);
+        signUpText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
