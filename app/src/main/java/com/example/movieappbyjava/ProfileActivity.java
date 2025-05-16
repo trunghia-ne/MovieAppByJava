@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
                     startActivity(new Intent(ProfileActivity.this, MyAccountActivity.class));
                     break;
                 case "Your Favorites":
-                    // startActivity(new Intent(...));
+                    startActivity(new Intent(ProfileActivity.this, Favorites.class));
                     break;
                 case "Logout":
                     finish(); // hoặc chuyển về LoginActivity

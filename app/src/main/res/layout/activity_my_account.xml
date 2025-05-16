@@ -83,6 +83,7 @@
                 android:layout_height="48dp"
                 android:hint="John"
                 android:background="@drawable/bg_edittext"
+                android:textSize="14sp"
                 android:paddingHorizontal="16dp" />
 
             <!-- Email -->
@@ -100,6 +101,7 @@
                 android:hint="Johndoe@email.com"
                 android:background="@drawable/bg_edittext"
                 android:paddingHorizontal="16dp"
+                android:textSize="14sp"
                 android:inputType="textEmailAddress" />
 
             <!-- Phone Number -->
@@ -127,6 +129,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:textSize="14sp"
                     android:hint="(+1) 234 567 890"
                     android:background="@android:color/transparent"
                     android:paddingHorizontal="12dp"
@@ -151,6 +154,7 @@
                     android:id="@+id/passwordEdit"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textSize="14sp"
                     android:hint="******"
                     android:paddingHorizontal="16dp"
                     android:inputType="textPassword"
