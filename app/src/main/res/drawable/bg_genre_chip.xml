@@ -1,0 +1,6 @@
+<!-- res/drawable/bg_genre_chip.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#1E1E1E" /> <!-- hoặc #2A2A2A tuỳ dark mode -->
+    <corners android:radius="20dp" />
+</shape>
