@@ -1,5 +1,6 @@
 package com.example.movieappbyjava.adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.movieappbyjava.DetailActivity2;
 import com.example.movieappbyjava.R;
 import com.example.movieappbyjava.model.Movie;
 
@@ -45,6 +47,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         Glide.with(holder.itemView.getContext())
                 .load(imageUrl)
                 .into(holder.poster);
+
+//         ✅ Khi click vào item -> mở DetailActivity và truyền slug
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DetailActivity2.class);
+            intent.putExtra("movie_slug", movie.getSlug());
+            v.getContext().startActivity(intent);
+        });
     }
 
 
