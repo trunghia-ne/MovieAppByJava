@@ -72,6 +72,26 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        TextView forgotPasswordText = findViewById(R.id.forgotPasswordText);
+        forgotPasswordText.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
+
+            if(email.isEmpty()) {
+                Toasty.error(LoginActivity.this, "Vui lòng nhập email để đặt lại mật khẩu", Toasty.LENGTH_SHORT, true).show();
+                return;
+            }
+
+            mAuth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()) {
+                            Toasty.success(LoginActivity.this, "Email đặt lại mật khẩu đã được gửi!", Toasty.LENGTH_LONG, true).show();
+                        } else {
+                            Toasty.error(LoginActivity.this, "Gửi email thất bại: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();
+                        }
+                    });
+        });
+
     }
 
     private void loginWithEmailPassword(String email, String password) {
