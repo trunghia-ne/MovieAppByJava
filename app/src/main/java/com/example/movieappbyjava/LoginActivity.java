@@ -19,6 +19,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.FirebaseApp;
 
+import es.dmoral.toasty.Toasty;
+
 public class LoginActivity extends AppCompatActivity {
     TextView registerNow;
     private EditText emailEditText, passwordEditText;
@@ -47,12 +49,17 @@ public class LoginActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
-            if(email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(LoginActivity.this, "Email và mật khẩu không được để trống", Toast.LENGTH_SHORT).show();
+            if(email.isEmpty()) {
+                Toasty.error(LoginActivity.this, "Email không được để trống", Toasty.LENGTH_SHORT, true).show();
                 return;
             }
 
-            // Gọi hàm đăng nhập Firebase
+            if(password.isEmpty()) {
+                Toasty.error(LoginActivity.this, "Mật khẩu không được để trống", Toasty.LENGTH_SHORT, true).show();
+                return;
+            }
+
+            // Nếu hợp lệ thì gọi đăng nhập Firebase
             loginWithEmailPassword(email, password);
         });
 
@@ -70,15 +77,14 @@ public class LoginActivity extends AppCompatActivity {
     private void loginWithEmailPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        // Chuyển sang HomeActivity hoặc màn hình chính
+                        Toasty.success(LoginActivity.this, "Đăng nhập thành công!", Toasty.LENGTH_SHORT, true).show();
                         Intent intent = new Intent(LoginActivity.this, HomeActaivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toasty.error(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();
                     }
                 });
     }
