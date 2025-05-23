@@ -13,6 +13,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
 
@@ -80,11 +84,34 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toasty.success(RegisterActivity.this, "Đăng ký thành công!", Toasty.LENGTH_SHORT, true).show();
-                        finish(); // Quay lại LoginActivity hoặc bạn có thể tự động đăng nhập luôn
+                        if (user != null) {
+                            // Lấy uid của user mới tạo
+                            String uid = user.getUid();
+
+                            // Tạo data profile mở rộng
+                            Map<String, Object> profile = new HashMap<>();
+                            profile.put("name", edtName.getText().toString().trim());
+                            profile.put("email", email);
+                            // Nếu có số điện thoại, địa chỉ bạn cũng có thể thêm tương tự
+                            // profile.put("phone", "0123456789");
+                            // profile.put("address", "Địa chỉ...");
+
+                            // Lưu dữ liệu profile vào Firestore
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("users").document(uid)
+                                    .set(profile)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toasty.success(RegisterActivity.this, "Đăng ký thành công!", Toasty.LENGTH_SHORT, true).show();
+                                        finish(); // Quay về LoginActivity
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toasty.error(RegisterActivity.this, "Lưu thông tin người dùng thất bại: " + e.getMessage(), Toasty.LENGTH_LONG, true).show();
+                                    });
+                        }
                     } else {
                         Toasty.error(RegisterActivity.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();
                     }
                 });
     }
+
 }
