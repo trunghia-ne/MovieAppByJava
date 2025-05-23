@@ -55,6 +55,8 @@ dependencies {
 
     // Thêm Firebase Auth nếu dùng
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-auth:22.3.0' // bản mới nhất
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 
     // Các thư viện Firebase khác nếu cần
     implementation 'com.google.firebase:firebase-firestore'
