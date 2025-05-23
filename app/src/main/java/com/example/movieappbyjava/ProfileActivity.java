@@ -13,8 +13,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class ProfileActivity extends AppCompatActivity {
     String[] menuItems = {"My Account", "Your Favorites", "History Watched", "Logout"};
+    private TextView tvUserName;
     int[] icons = {
             R.drawable.ic_user,
             R.drawable.ic_favorite,
@@ -52,5 +57,18 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        tvUserName = findViewById(R.id.tvUserName);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            FirebaseFirestore.getInstance().collection("users").document(user.getUid()).get()
+                    .addOnSuccessListener(doc -> {
+                        String name = (doc.exists() && doc.contains("name")) ? doc.getString("name") : "Tên người dùng";
+                        tvUserName.setText(name);
+                    })
+                    .addOnFailureListener(e -> tvUserName.setText("Tên người dùng"));
+        } else {
+            tvUserName.setText("Tên người dùng");
+        }
     }
 }

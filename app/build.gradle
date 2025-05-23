@@ -60,6 +60,7 @@ dependencies {
 
     // Các thư viện Firebase khác nếu cần
     implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-firestore:24.7.1'
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.github.GrenderG:Toasty:1.5.2'
 }
