@@ -83,19 +83,45 @@
                 android:textSize="16sp"
                 android:layout_marginTop="16dp" />
 
-            <LinearLayout
-                android:id="@+id/categoryTabs"
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                >
+                android:padding="8dp"
+                android:scrollbars="none">
 
-<!--                <Button android:text="All" style="@style/CategoryTabStyle"/>-->
-<!--                <Button android:text="Drama" style="@style/CategoryTabStyle"/>-->
-<!--                <Button android:text="Crime" style="@style/CategoryTabStyle"/>-->
-<!--                <Button android:text="Action" style="@style/CategoryTabStyle"/>-->
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/categoryTabs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tab_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All"
+                        android:textColor="#FFD700"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/tab_drama"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Drama"
+                        android:textColor="#FFD700"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <!-- Thêm các category khác -->
+                </LinearLayout>
+            </HorizontalScrollView>
+
+
 
             <!-- Single Movie -->
             <TextView

@@ -7,8 +7,11 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +41,9 @@ public class DetailActivity2 extends AppCompatActivity {
 
     private ImageView imagePoster;
     private TextView textTitle, textSummary, textInfo;
-    private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes; // đổi sang FlexboxLayout
+    private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
+    ScrollView contentLayout;
+    ProgressBar progressBarLoading;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -47,12 +52,15 @@ public class DetailActivity2 extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_detail2);
 
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        progressBarLoading = findViewById(R.id.progressBarLoading);
+        contentLayout = findViewById(R.id.main);
         imagePoster = findViewById(R.id.imagePoster);
         textTitle = findViewById(R.id.textTitle);
         textSummary = findViewById(R.id.textSummary);
@@ -73,6 +81,9 @@ public class DetailActivity2 extends AppCompatActivity {
     }
 
     private void fetchMovieDetail(String slug) {
+        progressBarLoading.setVisibility(View.VISIBLE);  // Hiện loading
+        contentLayout.setVisibility(View.GONE);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://phimapi.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -83,6 +94,9 @@ public class DetailActivity2 extends AppCompatActivity {
         api.getMovieDetail(slug).enqueue(new Callback<MovieDetailResponse>() {
             @Override
             public void onResponse(Call<MovieDetailResponse> call, Response<MovieDetailResponse> response) {
+                progressBarLoading.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);  // Hiện nội dung khi có dữ liệu
+
                 if (response.isSuccessful() && response.body() != null) {
                     Movie movie = response.body().getMovie();
 
@@ -151,6 +165,9 @@ public class DetailActivity2 extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
+                progressBarLoading.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);
+
                 Toast.makeText(DetailActivity2.this, "Không gọi được API", Toast.LENGTH_SHORT).show();
                 Log.e("API_ERROR", t.getMessage());
             }
