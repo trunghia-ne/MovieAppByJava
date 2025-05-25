@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.movieappbyjava.network.ApiService;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -21,6 +22,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 100;
@@ -104,13 +110,44 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(this, HomeActaivity.class));
-                        finish();
+                        // ✅ Gọi API từ backend sau khi đăng nhập Firebase thành công
+                        callBackendApi();
                     } else {
                         Toasty.error(this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();
                     }
                 });
     }
+
+    private void callBackendApi() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:8080/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        apiService.getHello().enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.d("API", "Kết nối backend thành công: " + response.body());
+
+                    // ✅ Sau khi gọi API xong thì vào HomeActivity
+                    startActivity(new Intent(LoginActivity.this, HomeActaivity.class));
+                    finish();
+                } else {
+                    Toasty.error(LoginActivity.this, "Lỗi backend: " + response.code(), Toasty.LENGTH_LONG, true).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toasty.error(LoginActivity.this, "Không kết nối được backend: " + t.getMessage(), Toasty.LENGTH_LONG, true).show();
+            }
+        });
+    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
