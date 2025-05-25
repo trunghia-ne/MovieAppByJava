@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.movieappbyjava.network.ApiService;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -21,6 +23,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 100;
@@ -98,6 +105,29 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
         });
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:8080/") // localhost của máy phát triển với Android Emulator
+                .addConverterFactory(ScalarsConverterFactory.create()) // Vì trả về String thuần
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        apiService.getHello().enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(response.isSuccessful()) {
+                    String message = response.body();
+                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "API call failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void loginWithEmailPassword(String email, String password) {
