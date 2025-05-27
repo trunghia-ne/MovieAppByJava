@@ -164,23 +164,32 @@ public class DetailActivity2 extends AppCompatActivity {
 
                 if (response.body().getEpisodes() != null && !response.body().getEpisodes().isEmpty()) {
                     List<Episode> episodeList = response.body().getEpisodes().get(0).getServer_data();
-                    for (Episode episode : episodeList) {
-                        TextView epView = new TextView(DetailActivity2.this);
-                        epView.setText(episode.getName());
-                        epView.setTextColor(Color.WHITE);
-                        epView.setTextSize(12);
-                        epView.setBackgroundResource(R.drawable.bg_episode_chip);
-                        epView.setPadding(24, 8, 24, 8);
+                    for (int i = 0; i < episodeList.size(); i++) {
+                        Episode episode = episodeList.get(i);
 
-                        // Dùng Flexbox nếu đang dùng FlexboxLayout
+                        // 👉 Hiển thị số thứ tự: 01, 02, 03,...
+                        String label = String.format("%02d", i + 1);
+
+                        TextView epView = new TextView(DetailActivity2.this);
+                        epView.setText(label);  // ⚠️ bỏ chữ "Tập", chỉ còn "01", "02",...
+
+                        epView.setTextColor(Color.WHITE);
+                        epView.setTextSize(13); // nhỏ gọn vừa phải
+                        epView.setTypeface(null, Typeface.BOLD); // cho đậm dễ nhìn
+                        epView.setBackgroundResource(R.drawable.bg_episode_chip);
+
+                        // 👉 Tăng kích thước khung (padding lớn hơn)
+                        epView.setPadding(36, 20, 36, 20);  // trái, trên, phải, dưới
+
+                        // 👉 Tăng margin giữa các chip
                         FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT
                         );
-                        lp.setMargins(8, 6, 8, 6);
+                        lp.setMargins(12, 10, 12, 10);
                         epView.setLayoutParams(lp);
 
-                        // Xử lý click để mở màn hình xem phim
+                        // 👉 Click để mở WatchActivity
                         epView.setOnClickListener(v -> {
                             Intent intent = new Intent(DetailActivity2.this, WatchActivity.class);
                             intent.putExtra("video_url", episode.getLink_embed());
@@ -190,8 +199,6 @@ public class DetailActivity2 extends AppCompatActivity {
                         layoutEpisodes.addView(epView);
                     }
                 }
-
-
             }
 
             @Override
@@ -210,17 +217,17 @@ public class DetailActivity2 extends AppCompatActivity {
         chip.setText(text);
         chip.setTextColor(Color.WHITE);
         chip.setBackgroundResource(R.drawable.bg_episode_chip);
-        chip.setTextSize(10);
+        chip.setTextSize(12);
         chip.setTypeface(null, Typeface.BOLD);
         chip.setSingleLine(true);
         chip.setEllipsize(TextUtils.TruncateAt.END);
-        chip.setPadding(24, 8, 24, 8);
+        chip.setPadding(32, 14, 32, 14);
 
         FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
                 FlexboxLayout.LayoutParams.WRAP_CONTENT
         );
-        lp.setMargins(6, 6, 6, 6);
+        lp.setMargins(12, 12, 12, 12);
         chip.setLayoutParams(lp);
         return chip;
     }
