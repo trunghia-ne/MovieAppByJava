@@ -2,10 +2,12 @@ package com.example.movieappbyjava;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +36,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailEditText, passwordEditText;
     private Button loginBtn;
+
+    ImageView togglePassword;
     private Button googleSignInBtn;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-
+    final boolean[] isPasswordVisible = {false};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +58,27 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         loginBtn = findViewById(R.id.loginBtn);
         googleSignInBtn = findViewById(R.id.googleSignInBtn); // nút Google
+        togglePassword = findViewById(R.id.togglePassword);
 
         mAuth = FirebaseAuth.getInstance();
+
+        //An hien password
+        togglePassword.setOnClickListener(v -> {
+            isPasswordVisible[0] = !isPasswordVisible[0];
+
+            if (isPasswordVisible[0]) {
+                // Hiện mật khẩu
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                togglePassword.setImageResource(R.drawable.ic_eye_open);
+            } else {
+                // Ẩn mật khẩu
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                togglePassword.setImageResource(R.drawable.ic_eye_closed);
+            }
+
+            // Giữ vị trí con trỏ ở cuối
+            passwordEditText.setSelection(passwordEditText.getText().length());
+        });
 
         // Google Sign-In config
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
