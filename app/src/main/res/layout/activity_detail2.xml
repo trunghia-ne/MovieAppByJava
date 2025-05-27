@@ -216,21 +216,52 @@
                 android:layout_marginBottom="8dp" />
 
 
-            <!-- Điểm đánh giá (0.5 - 10.0) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chọn điểm đánh giá"
+                android:text="Chọn sao đánh giá"
                 android:textColor="#EEE"
                 android:textSize="14sp"
                 android:layout_marginBottom="4dp" />
 
-            <NumberPicker
-                android:id="@+id/numberPickerScore"
+            <RatingBar
+                android:id="@+id/ratingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:rating="0"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"
+                style="?android:attr/ratingBarStyleSmall" />
+            <LinearLayout
+                android:id="@+id/layoutRatingStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Điểm"
+                    android:textColor="#AAA"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textRatingStats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="8.7 || 29 đánh giá"
+                    android:textColor="#DDD"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
 
 
             <EditText
