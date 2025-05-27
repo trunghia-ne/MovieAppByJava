@@ -36,7 +36,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="12dp"
-                android:background="@drawable/round_dark"
+                android:background="@android:color/transparent"
                 android:src="@drawable/ic_back"
                 android:scaleType="centerInside"
                 app:tint="#FFF" />
@@ -48,10 +48,28 @@
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="12dp"
-                android:background="@drawable/round_dark"
+                android:background="@android:color/transparent"
                 android:src="@drawable/ic_favorite"
                 android:scaleType="centerInside"
                 app:tint="#FFF" />
+
+            <ImageButton
+                android:id="@+id/btnWatchTrailer"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/bg_trailer_button"
+                android:src="@drawable/ic_play"
+                android:scaleType="centerInside"
+                android:contentDescription="Watch Trailer"
+                app:tint="#FFF"
+                android:visibility="gone" />
+
+            <WebView
+                android:id="@+id/webTrailer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"
@@ -102,7 +120,8 @@
                 android:text="Summary"
                 android:textColor="#FFD700"
                 android:textSize="15sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppin"
+                android:textFontWeight="500"
                 android:layout_marginTop="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -184,9 +203,11 @@
 </ScrollView>
     <ProgressBar
         android:id="@+id/progressBarLoading"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:indeterminateTint="@android:color/holo_blue_light"/>
 </FrameLayout>
