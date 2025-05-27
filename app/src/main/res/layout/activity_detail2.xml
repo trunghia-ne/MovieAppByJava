@@ -198,6 +198,61 @@
                 android:layout_marginTop="8dp"
                 app:flexWrap="wrap"
                 app:justifyContent="flex_start" />
+            <!-- Đánh giá phim -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#444"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đánh giá phim"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FFD700"
+                android:layout_marginBottom="8dp" />
+
+
+            <!-- Điểm đánh giá (0.5 - 10.0) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn điểm đánh giá"
+                android:textColor="#EEE"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <NumberPicker
+                android:id="@+id/numberPickerScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp" />
+
+
+            <EditText
+                android:id="@+id/editComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Viết bình luận của bạn..."
+                android:background="@android:color/white"
+                android:textColor="#000"
+                android:padding="10dp"
+                android:minHeight="100dp"
+                android:gravity="top"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnSubmitRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gửi đánh giá"
+                android:textColor="#FFF"
+                android:backgroundTint="#FFD700" />
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
