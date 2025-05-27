@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -39,11 +40,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailActivity2 extends AppCompatActivity {
 
-    private ImageView imagePoster;
+    private ImageView imagePoster, btnWatchTrailer;
     private TextView textTitle, textSummary, textInfo;
     private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
     ScrollView contentLayout;
     ProgressBar progressBarLoading;
+
+    WebView webTrailer;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -69,6 +72,11 @@ public class DetailActivity2 extends AppCompatActivity {
         layoutDirectors = findViewById(R.id.layoutDirectors);
         layoutEpisodes = findViewById(R.id.layoutEpisodes);
         textInfo = findViewById(R.id.textInfo);
+        btnWatchTrailer = findViewById(R.id.btnWatchTrailer);
+        webTrailer = findViewById(R.id.webTrailer);
+        webTrailer.getSettings().setJavaScriptEnabled(true);
+        webTrailer.getSettings().setLoadWithOverviewMode(true);
+        webTrailer.getSettings().setUseWideViewPort(true);
 
         String slug = getIntent().getStringExtra("movie_slug");
         if (slug == null) {
@@ -125,7 +133,29 @@ public class DetailActivity2 extends AppCompatActivity {
                         layoutDirectors.addView(createChip(director));
                     }
 
+                    btnWatchTrailer.setVisibility(View.VISIBLE);
+                    btnWatchTrailer.setOnClickListener(v -> {
+                        btnWatchTrailer.setVisibility(View.GONE);
+                        imagePoster.setVisibility(View.GONE);
+                        webTrailer.setVisibility(View.VISIBLE);
 
+                        String rawUrl = movie.getTrailer_url();
+
+                        // 👉 Nếu là link YouTube thường, chuyển sang embed
+                        if (rawUrl.contains("watch?v=")) {
+                            rawUrl = rawUrl.replace("watch?v=", "embed/");
+                        }
+
+                        // 👉 Nhúng vào WebView
+                        String html = "<html><body style='margin:0;padding:0;'>"
+                                + "<iframe width='100%' height='100%' "
+                                + "src='" + rawUrl + "' frameborder='0' "
+                                + "allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' "
+                                + "allowfullscreen></iframe>"
+                                + "</body></html>";
+
+                        webTrailer.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+                    });
                 } else {
                     Toast.makeText(DetailActivity2.this, "Lỗi tải phim", Toast.LENGTH_SHORT).show();
                 }
@@ -160,6 +190,7 @@ public class DetailActivity2 extends AppCompatActivity {
                         layoutEpisodes.addView(epView);
                     }
                 }
+
 
             }
 
