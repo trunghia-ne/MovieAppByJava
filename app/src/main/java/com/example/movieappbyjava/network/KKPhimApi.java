@@ -28,4 +28,11 @@ public interface KKPhimApi {
 
     @GET("phim/{slug}")
     Call<MovieDetailResponse> getMovieDetail(@Path("slug") String slug);
+
+    @GET("v1/api/tim-kiem")
+        // Đường dẫn của API tìm kiếm
+    Call<ApiResponsePhim> searchMovies(
+            @Query("keyword") String keyword,
+            @Query("limit") int limit
+    );
 }
