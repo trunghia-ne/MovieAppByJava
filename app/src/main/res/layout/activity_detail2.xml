@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_frame"
@@ -11,282 +11,289 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:visibility="visible"
         android:clipToPadding="false">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- ✅ Ảnh phim không bị padding -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="400dp">
-
-            <ImageView
-                android:id="@+id/imagePoster"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
-
-            <!-- Nút Back -->
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="12dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_back"
-                android:scaleType="centerInside"
-                app:tint="#FFF" />
-
-            <!-- Nút yêu thích -->
-            <ImageButton
-                android:id="@+id/btnFav"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="12dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_favorite"
-                android:scaleType="centerInside"
-                app:tint="#FFF" />
-
-            <ImageButton
-                android:id="@+id/btnWatchTrailer"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/bg_trailer_button"
-                android:src="@drawable/ic_play"
-                android:scaleType="centerInside"
-                android:contentDescription="Watch Trailer"
-                app:tint="#FFF"
-                android:visibility="gone" />
-
-            <WebView
-                android:id="@+id/webTrailer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:layout_alignParentBottom="true"
-                android:background="@drawable/bg_black_fade_top" />
-        </RelativeLayout>
-
-        <!-- ✅ Các phần còn lại có padding -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="wrap_content">
 
-            <!-- Tiêu đề -->
-            <TextView
-                android:id="@+id/textTitle"
+            <!-- Phần ảnh phim -->
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#FFF"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp" />
+                android:layout_height="400dp">
 
-            <TextView
-                android:id="@+id/textInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#EEE"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/star"
-                android:drawablePadding="4dp" />
+                <ImageView
+                    android:id="@+id/imagePoster"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
 
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="12dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_back"
+                    android:scaleType="centerInside"
+                    app:tint="#FFF" />
 
-            <!-- Thể loại -->
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/layoutGenres"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:flexWrap="wrap"
-                app:justifyContent="flex_start" />
+                <ImageButton
+                    android:id="@+id/btnFav"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="12dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_favorite"
+                    android:scaleType="centerInside"
+                    app:tint="#FFF" />
 
-            <!-- Summary -->
-            <TextView
-                android:text="Summary"
-                android:textColor="#FFD700"
-                android:textSize="15sp"
-                android:fontFamily="@font/poppin"
-                android:textFontWeight="500"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <ImageButton
+                    android:id="@+id/btnWatchTrailer"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bg_trailer_button"
+                    android:src="@drawable/ic_play"
+                    android:scaleType="centerInside"
+                    android:contentDescription="Watch Trailer"
+                    app:tint="#FFF"
+                    android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/textSummary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#EEE"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"
-                android:justificationMode="inter_word"
-                android:lineSpacingExtra="2dp"/>
+                <WebView
+                    android:id="@+id/webTrailer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
 
-            <!-- Diễn viên -->
-            <TextView
-                android:text="Actors"
-                android:textColor="#FFD700"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/bg_black_fade_top" />
+            </RelativeLayout>
 
-            <!-- RecyclerView diễn viên -->
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/layoutActors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                app:flexWrap="wrap"
-                app:justifyContent="flex_start" />
-
-            <!-- Đạo diễn -->
+            <!-- Nội dung chi tiết -->
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="15dp">
+                android:padding="16dp">
+
+                <!-- Tiêu đề -->
+                <TextView
+                    android:id="@+id/textTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp" />
 
                 <TextView
-                    android:text="Director:"
-                    android:textColor="#FFD700"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
+                    android:id="@+id/textInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp" />
+                    android:textColor="#EEE"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    android:drawablePadding="4dp" />
 
                 <com.google.android.flexbox.FlexboxLayout
-                    android:id="@+id/layoutDirectors"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:id="@+id/layoutGenres"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     app:flexWrap="wrap"
                     app:justifyContent="flex_start" />
-            </LinearLayout>
-
-
-            <TextView
-                android:text="Episodes"
-                android:textColor="#FFD700"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginTop="15dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/layoutEpisodes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:flexWrap="wrap"
-                app:justifyContent="flex_start" />
-            <!-- Đánh giá phim -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#444"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đánh giá phim"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#FFD700"
-                android:layout_marginBottom="8dp" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chọn sao đánh giá"
-                android:textColor="#EEE"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp" />
-
-            <RatingBar
-                android:id="@+id/ratingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:stepSize="0.5"
-                android:rating="0"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="12dp"
-                style="?android:attr/ratingBarStyleSmall" />
-            <LinearLayout
-                android:id="@+id/layoutRatingStats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp"
-                android:paddingBottom="8dp"
-                android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:text="Summary"
+                    android:textColor="#FFD700"
+                    android:textSize="15sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/textSummary"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Điểm"
-                    android:textColor="#AAA"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="#EEE"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="2dp" />
 
                 <TextView
-                    android:id="@+id/textRatingStats"
+                    android:text="Actors"
+                    android:textColor="#FFD700"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/layoutActors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    app:flexWrap="wrap"
+                    app:justifyContent="flex_start" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="15dp">
+
+                    <TextView
+                        android:text="Director:"
+                        android:textColor="#FFD700"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp" />
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/layoutDirectors"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        app:flexWrap="wrap"
+                        app:justifyContent="flex_start" />
+                </LinearLayout>
+
+                <TextView
+                    android:text="Episodes"
+                    android:textColor="#FFD700"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/layoutEpisodes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:flexWrap="wrap"
+                    app:justifyContent="flex_start" />
+
+                <!-- Đánh giá -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#444"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="8.7 || 29 đánh giá"
-                    android:textColor="#DDD"
+                    android:text="Đánh giá phim"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFD700"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn sao đánh giá"
+                    android:textColor="#EEE"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginBottom="4dp" />
+                <androidx.appcompat.widget.AppCompatRatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1"
+                    android:progressDrawable="@drawable/rating_bar_selector"
+                    style="@style/Widget.AppCompat.RatingBar" />
+
+                <LinearLayout
+                    android:id="@+id/layoutRatingStats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:paddingBottom="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Điểm"
+                        android:textColor="#AAA"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textRatingStats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8.7 || 29 đánh giá"
+                        android:textColor="#DDD"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/editComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Viết bình luận của bạn..."
+                    android:background="#fff"
+                    android:textColor="#070707"
+                    app:hintTextColor="#070707"
+                    android:padding="12dp"
+                    android:minHeight="100dp"
+                    android:gravity="top"
+                    android:layout_marginBottom="12dp"
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSubmitRating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gửi đánh giá"
+                    android:textColor="#000"
+                    android:background="#FFD700"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+
+                <Button
+                    android:id="@+id/btnDeleteRating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Xoá đánh giá"
+                    android:textColor="#FFF"
+                    android:background="#F44336"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerComments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="32dp"
+                    android:nestedScrollingEnabled="false" />
             </LinearLayout>
-
-
-
-            <EditText
-                android:id="@+id/editComment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Viết bình luận của bạn..."
-                android:background="@android:color/white"
-                android:textColor="#000"
-                android:padding="10dp"
-                android:minHeight="100dp"
-                android:gravity="top"
-                android:layout_marginBottom="12dp" />
-
-            <Button
-                android:id="@+id/btnSubmitRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Gửi đánh giá"
-                android:textColor="#FFF"
-                android:backgroundTint="#FFD700" />
-
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+
     <ProgressBar
         android:id="@+id/progressBarLoading"
         style="?android:attr/progressBarStyleSmall"
@@ -294,6 +301,5 @@
         android:layout_height="32dp"
         android:layout_gravity="center"
         android:indeterminate="true"
-        android:visibility="gone"
-        android:indeterminateTint="@android:color/holo_blue_light"/>
+        android:visibility="gone" />
 </FrameLayout>
