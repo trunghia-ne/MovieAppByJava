@@ -35,6 +35,7 @@ import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
 import com.example.movieappbyjava.network.KKPhimApi;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -65,11 +66,14 @@ public class DetailActivity2 extends AppCompatActivity {
     private RatingBar ratingBar;
     private EditText editComment;
     private Button btnSubmitRating, btnDeleteRating;
-    private TextView textRatingStats;
+    private TextView textRatingStats, textCommentsHeader;
     private RecyclerView recyclerComments;
     private View layoutEmptyComments;
     private String currentRatingId = null;
     private String movieId;
+    private String movieTitle;
+    private CommentAdapter commentAdapter;
+    private List<Comment> commentsList = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -84,6 +88,20 @@ public class DetailActivity2 extends AppCompatActivity {
             return insets;
         });
 
+        initializeViews();
+        setupRecyclerView();
+
+        String slug = getIntent().getStringExtra("movie_slug");
+        if (slug == null) {
+            Toast.makeText(this, "Không có thông tin phim", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        fetchMovieDetail(slug);
+    }
+
+    private void initializeViews() {
         progressBarLoading = findViewById(R.id.progressBarLoading);
         contentLayout = findViewById(R.id.main);
         imagePoster = findViewById(R.id.imagePoster);
@@ -105,22 +123,21 @@ public class DetailActivity2 extends AppCompatActivity {
         btnSubmitRating = findViewById(R.id.btnSubmitRating);
         btnDeleteRating = findViewById(R.id.btnDeleteRating);
         textRatingStats = findViewById(R.id.textRatingStats);
+        textCommentsHeader = findViewById(R.id.textCommentsHeader);
         recyclerComments = findViewById(R.id.recyclerComments);
-        recyclerComments.setLayoutManager(new LinearLayoutManager(this));
         layoutEmptyComments = findViewById(R.id.layoutEmptyComments);
 
         btnSubmitRating.setOnClickListener(v -> submitOrUpdateRating());
         btnDeleteRating.setOnClickListener(v -> deleteRating());
-
-        String slug = getIntent().getStringExtra("movie_slug");
-        if (slug == null) {
-            Toast.makeText(this, "Không có thông tin phim", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        fetchMovieDetail(slug);
     }
+
+    private void setupRecyclerView() {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        commentAdapter = new CommentAdapter(commentsList, currentUserId);
+        recyclerComments.setLayoutManager(new LinearLayoutManager(this));
+        recyclerComments.setAdapter(commentAdapter);
+    }
+
 
     private void fetchMovieDetail(String slug) {
         progressBarLoading.setVisibility(View.VISIBLE);
@@ -142,82 +159,9 @@ public class DetailActivity2 extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Movie movie = response.body().getMovie();
                     movieId = slug;
+                    movieTitle = movie.getName();
 
-                    textTitle.setText(movie.getName());
-                    textSummary.setText(movie.getContent());
-                    textInfo.setText(movie.getTime() + "   •   " + movie.getYear() + "   •   " + movie.getView() + " view");
-
-                    Glide.with(DetailActivity2.this)
-                            .load(movie.getPoster_url())
-                            .into(imagePoster);
-
-                    layoutGenres.removeAllViews();
-                    for (Category category : movie.getCategory()) {
-                        layoutGenres.addView(createChip(category.getName()));
-                    }
-
-                    layoutActors.removeAllViews();
-                    for (String actor : movie.getActor()) {
-                        layoutActors.addView(createChip(actor));
-                    }
-
-                    layoutDirectors.removeAllViews();
-                    for (String director : movie.getDirector()) {
-                        layoutDirectors.addView(createChip(director));
-                    }
-
-                    btnWatchTrailer.setVisibility(View.VISIBLE);
-                    btnWatchTrailer.setOnClickListener(v -> {
-                        btnWatchTrailer.setVisibility(View.GONE);
-                        imagePoster.setVisibility(View.GONE);
-                        webTrailer.setVisibility(View.VISIBLE);
-
-                        String rawUrl = movie.getTrailer_url();
-                        if (rawUrl.contains("watch?v=")) {
-                            rawUrl = rawUrl.replace("watch?v=", "embed/");
-                        }
-
-                        String html = "<html><body style='margin:0;padding:0;'>"
-                                + "<iframe width='100%' height='100%' "
-                                + "src='" + rawUrl + "' frameborder='0' "
-                                + "allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' "
-                                + "allowfullscreen></iframe>"
-                                + "</body></html>";
-
-                        webTrailer.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
-                    });
-
-                    layoutEpisodes.removeAllViews();
-                    if (response.body().getEpisodes() != null && !response.body().getEpisodes().isEmpty()) {
-                        List<Episode> episodeList = response.body().getEpisodes().get(0).getServer_data();
-                        for (int i = 0; i < episodeList.size(); i++) {
-                            Episode episode = episodeList.get(i);
-                            String label = String.format("%02d", i + 1);
-
-                            TextView epView = new TextView(DetailActivity2.this);
-                            epView.setText(label);
-                            epView.setTextColor(Color.WHITE);
-                            epView.setTextSize(13);
-                            epView.setTypeface(null, Typeface.BOLD);
-                            epView.setBackgroundResource(R.drawable.bg_episode_chip);
-                            epView.setPadding(36, 20, 36, 20);
-
-                            FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
-                                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                                    FlexboxLayout.LayoutParams.WRAP_CONTENT);
-                            lp.setMargins(12, 10, 12, 10);
-                            epView.setLayoutParams(lp);
-
-                            epView.setOnClickListener(v -> {
-                                Intent intent = new Intent(DetailActivity2.this, WatchActivity.class);
-                                intent.putExtra("video_url", episode.getLink_embed());
-                                startActivity(intent);
-                            });
-
-                            layoutEpisodes.addView(epView);
-                        }
-                    }
-
+                    setupMovieDetails(movie, response.body());
                     loadUserRating();
                     updateRatingStats();
                     loadComments();
@@ -235,6 +179,99 @@ public class DetailActivity2 extends AppCompatActivity {
                 Log.e("API_ERROR", t.getMessage());
             }
         });
+    }
+
+    private void setupMovieDetails(Movie movie, MovieDetailResponse response) {
+        textTitle.setText(movie.getName());
+        textSummary.setText(movie.getContent());
+        textInfo.setText(movie.getTime() + "   •   " + movie.getYear() + "   •   " + movie.getView() + " view");
+
+        Glide.with(DetailActivity2.this)
+                .load(movie.getPoster_url())
+                .into(imagePoster);
+
+        setupGenres(movie);
+        setupActors(movie);
+        setupDirectors(movie);
+        setupTrailer(movie);
+        setupEpisodes(response);
+    }
+
+    private void setupGenres(Movie movie) {
+        layoutGenres.removeAllViews();
+        for (Category category : movie.getCategory()) {
+            layoutGenres.addView(createChip(category.getName()));
+        }
+    }
+
+    private void setupActors(Movie movie) {
+        layoutActors.removeAllViews();
+        for (String actor : movie.getActor()) {
+            layoutActors.addView(createChip(actor));
+        }
+    }
+
+    private void setupDirectors(Movie movie) {
+        layoutDirectors.removeAllViews();
+        for (String director : movie.getDirector()) {
+            layoutDirectors.addView(createChip(director));
+        }
+    }
+
+    private void setupTrailer(Movie movie) {
+        btnWatchTrailer.setVisibility(View.VISIBLE);
+        btnWatchTrailer.setOnClickListener(v -> {
+            btnWatchTrailer.setVisibility(View.GONE);
+            imagePoster.setVisibility(View.GONE);
+            webTrailer.setVisibility(View.VISIBLE);
+
+            String rawUrl = movie.getTrailer_url();
+            if (rawUrl.contains("watch?v=")) {
+                rawUrl = rawUrl.replace("watch?v=", "embed/");
+            }
+
+            String html = "<html><body style='margin:0;padding:0;'>"
+                    + "<iframe width='100%' height='100%' "
+                    + "src='" + rawUrl + "' frameborder='0' "
+                    + "allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' "
+                    + "allowfullscreen></iframe>"
+                    + "</body></html>";
+
+            webTrailer.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+        });
+    }
+
+    private void setupEpisodes(MovieDetailResponse response) {
+        layoutEpisodes.removeAllViews();
+        if (response.getEpisodes() != null && !response.getEpisodes().isEmpty()) {
+            List<Episode> episodeList = response.getEpisodes().get(0).getServer_data();
+            for (int i = 0; i < episodeList.size(); i++) {
+                Episode episode = episodeList.get(i);
+                String label = String.format("%02d", i + 1);
+
+                TextView epView = new TextView(DetailActivity2.this);
+                epView.setText(label);
+                epView.setTextColor(Color.WHITE);
+                epView.setTextSize(13);
+                epView.setTypeface(null, Typeface.BOLD);
+                epView.setBackgroundResource(R.drawable.bg_episode_chip);
+                epView.setPadding(36, 20, 36, 20);
+
+                FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(12, 10, 12, 10);
+                epView.setLayoutParams(lp);
+
+                epView.setOnClickListener(v -> {
+                    Intent intent = new Intent(DetailActivity2.this, WatchActivity.class);
+                    intent.putExtra("video_url", episode.getLink_embed());
+                    startActivity(intent);
+                });
+
+                layoutEpisodes.addView(epView);
+            }
+        }
     }
 
     private TextView createChip(String text) {
@@ -256,11 +293,12 @@ public class DetailActivity2 extends AppCompatActivity {
     }
 
     private String getUserId() {
-        return getSharedPreferences("users", MODE_PRIVATE).getString("uid", null);
+        return getSharedPreferences("users", MODE_PRIVATE).getString("uid", "anonymous_" + System.currentTimeMillis());
     }
 
     private String getUserName() {
-        return getSharedPreferences("users", MODE_PRIVATE).getString("username", null);
+        String username = getSharedPreferences("users", MODE_PRIVATE).getString("username", null);
+        return username != null ? username : "Người dùng " + System.currentTimeMillis();
     }
 
     private void submitOrUpdateRating() {
@@ -287,63 +325,95 @@ public class DetailActivity2 extends AppCompatActivity {
         data.put("rating", rating);
         data.put("comment", comment);
         data.put("movieId", movieId);
+        data.put("movieTitle", movieTitle);
         data.put("timestamp", FieldValue.serverTimestamp());
 
         if (currentRatingId == null) {
+            // Add new rating
             db.collection("reviews")
                     .add(data)
                     .addOnSuccessListener(documentReference -> {
                         currentRatingId = documentReference.getId();
-                        Toast.makeText(this, "Đánh giá thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Đánh giá thành công!", Toast.LENGTH_SHORT).show();
+                        editComment.setText("");
+                        ratingBar.setRating(0);
+                        btnDeleteRating.setVisibility(View.VISIBLE);
+
+                        // Add comment to list and update UI immediately
+                        Comment newComment = new Comment(username, comment, rating, new Date(), uid, movieTitle);
+                        commentAdapter.addComment(newComment);
+                        recyclerComments.scrollToPosition(0);
+
                         updateRatingStats();
-                        loadComments();
+                        updateCommentsUI();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("FIREBASE_ERROR", "Error adding rating", e);
                     });
         } else {
-            db.collection("reviews")
-                    .document(currentRatingId)
-                    .set(data)
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(this, "Cập nhật đánh giá thành công", Toast.LENGTH_SHORT).show();
-                        updateRatingStats();
+            // Update existing rating
+            db.collection("reviews").document(currentRatingId)
+                    .update(data)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Cập nhật đánh giá thành công!", Toast.LENGTH_SHORT).show();
+                        editComment.setText("");
+                        ratingBar.setRating(0);
                         loadComments();
+                        updateRatingStats();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("FIREBASE_ERROR", "Error updating rating", e);
                     });
         }
     }
 
     private void deleteRating() {
-        if (currentRatingId != null) {
-            FirebaseFirestore.getInstance().collection("reviews")
-                    .document(currentRatingId)
-                    .delete()
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(this, "Xóa đánh giá thành công", Toast.LENGTH_SHORT).show();
-                        currentRatingId = null;
-                        ratingBar.setRating(0);
-                        editComment.setText("");
-                        updateRatingStats();
-                        loadComments();
-                    });
-        }
+        if (currentRatingId == null) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("reviews").document(currentRatingId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Xoá đánh giá thành công!", Toast.LENGTH_SHORT).show();
+                    currentRatingId = null;
+                    btnDeleteRating.setVisibility(View.GONE);
+                    editComment.setText("");
+                    ratingBar.setRating(0);
+                    loadComments();
+                    updateRatingStats();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("FIREBASE_ERROR", "Error deleting rating", e);
+                });
     }
 
     private void loadUserRating() {
+        String uid = getUserId();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         db.collection("reviews")
                 .whereEqualTo("movieId", movieId)
-                .whereEqualTo("userId", getUserId())
-                .limit(1)
+                .whereEqualTo("userId", uid)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
                         currentRatingId = doc.getId();
-                        ratingBar.setRating(doc.getDouble("rating").floatValue());
-                        editComment.setText(doc.getString("comment"));
+
+                        Double rating = doc.getDouble("rating");
+                        String comment = doc.getString("comment");
+
+                        if (rating != null) ratingBar.setRating(rating.floatValue());
+                        if (comment != null) editComment.setText(comment);
+
                         btnDeleteRating.setVisibility(View.VISIBLE);
-                    } else {
-                        btnDeleteRating.setVisibility(View.GONE);
+                        btnSubmitRating.setText("Cập nhật đánh giá");
                     }
-                });
+                })
+                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error loading user rating", e));
     }
 
     private void updateRatingStats() {
@@ -352,15 +422,25 @@ public class DetailActivity2 extends AppCompatActivity {
                 .whereEqualTo("movieId", movieId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int count = queryDocumentSnapshots.size();
-                    double total = 0;
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        total += doc.getDouble("rating");
+                    int totalReviews = queryDocumentSnapshots.size();
+
+                    if (totalReviews > 0) {
+                        double totalRating = 0;
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                            Double rating = doc.getDouble("rating");
+                            if (rating != null) {
+                                totalRating += rating;
+                            }
+                        }
+
+                        double averageRating = totalRating / totalReviews;
+                        textRatingStats.setText(String.format(Locale.getDefault(),
+                                "%.1f ⭐ | %d đánh giá", averageRating, totalReviews));
+                    } else {
+                        textRatingStats.setText("Chưa có đánh giá");
                     }
-                    double avg = count > 0 ? total / count : 0;
-                    textRatingStats.setText(String.format(Locale.getDefault(),
-                            "Đánh giá: %.1f (%d lượt)", avg, count));
-                });
+                })
+                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error updating rating stats", e));
     }
 
     private void loadComments() {
@@ -370,25 +450,40 @@ public class DetailActivity2 extends AppCompatActivity {
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Comment> comments = new ArrayList<>();
+                    commentsList.clear();
+
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         String username = doc.getString("username");
                         String comment = doc.getString("comment");
-                        double rating = doc.getDouble("rating");
+                        Double rating = doc.getDouble("rating");
                         Date timestamp = doc.getDate("timestamp");
+                        String userId = doc.getString("userId");
+                        String movieTitle = doc.getString("movieTitle");
 
-                        comments.add(new Comment(username, comment, rating, timestamp));
+                        if (username != null && comment != null && rating != null && timestamp != null && userId != null) {
+                            Comment cmt = new Comment(username, comment, rating, timestamp, userId, movieTitle);
+                            commentsList.add(cmt);
+                        }
                     }
 
-                    if (comments.isEmpty()) {
-                        layoutEmptyComments.setVisibility(View.VISIBLE);
-                        recyclerComments.setVisibility(View.GONE);
-                    } else {
-                        layoutEmptyComments.setVisibility(View.GONE);
-                        recyclerComments.setVisibility(View.VISIBLE);
-                    }
-
-                    recyclerComments.setAdapter(new CommentAdapter(comments));
+                    commentAdapter.notifyDataSetChanged();
+                    updateCommentsUI();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Không thể tải bình luận", Toast.LENGTH_SHORT).show();
+                    Log.e("FIREBASE_ERROR", "Error loading comments", e);
                 });
+    }
+
+    private void updateCommentsUI() {
+        if (commentsList.isEmpty()) {
+            layoutEmptyComments.setVisibility(View.VISIBLE);
+            recyclerComments.setVisibility(View.GONE);
+            textCommentsHeader.setText("Chưa có bình luận");
+        } else {
+            layoutEmptyComments.setVisibility(View.GONE);
+            recyclerComments.setVisibility(View.VISIBLE);
+            textCommentsHeader.setText("Bình luận (" + commentsList.size() + ")");
+        }
     }
 }
