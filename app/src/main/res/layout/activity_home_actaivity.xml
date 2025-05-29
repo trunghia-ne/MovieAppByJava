@@ -34,7 +34,10 @@
                 android:padding="12dp"
                 android:drawableEnd="@drawable/microphone"
                 android:hint="Search Movie..."
-                android:textColorHint="@color/white" />
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:textSize="14dp"
+                android:gravity="center_vertical"/>
 
             <!-- ViewPager banner -->
             <androidx.cardview.widget.CardView
