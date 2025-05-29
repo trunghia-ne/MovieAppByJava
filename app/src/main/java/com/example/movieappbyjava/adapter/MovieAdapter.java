@@ -18,21 +18,15 @@ import com.example.movieappbyjava.DetailActivity2;
 import com.example.movieappbyjava.R;
 import com.example.movieappbyjava.model.Movie;
 
-import java.util.ArrayList; // Cần thiết cho new ArrayList<>()
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     private List<Movie> movies;
-    // Context có thể không cần thiết nếu bạn luôn lấy từ itemView.getContext()
-    // private Context context;
 
     public MovieAdapter(List<Movie> movies) {
         this.movies = movies;
-        // if (this.movies == null) { // Đảm bảo movies không bao giờ null ngay từ đầu
-        //     this.movies = new ArrayList<>();
-        // }
-        // this.context = context; // Nếu bạn truyền context qua constructor
     }
 
     @NonNull
@@ -46,19 +40,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movies.get(position);
-        // Kiểm tra movie null để tránh lỗi hiếm gặp
         if (movie == null) {
             return;
         }
 
         holder.title.setText(movie.getName());
 
-        // Xử lý URL ảnh
         String imageUrl = movie.getPoster_url();
         if (imageUrl != null && !imageUrl.startsWith("http") && !imageUrl.isEmpty()) {
             imageUrl = "https://img.phimapi.com/" + imageUrl;
         } else if (imageUrl == null || imageUrl.isEmpty()) {
-            // Fallback sang thumb_url nếu poster_url không có
             imageUrl = movie.getThumb_url();
             if (imageUrl != null && !imageUrl.startsWith("http") && !imageUrl.isEmpty()) {
                 imageUrl = "https://img.phimapi.com/" + imageUrl;
@@ -67,8 +58,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         Glide.with(holder.itemView.getContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.placeholder_shape) // Ảnh giữ chỗ
-                .error(R.drawable.placeholder_shape)       // Ảnh khi lỗi (có thể dùng chung)
+                .placeholder(R.drawable.placeholder_shape)
+                .error(R.drawable.placeholder_shape)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.poster);
 
@@ -78,8 +69,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 intent.putExtra("movie_slug", movie.getSlug());
                 v.getContext().startActivity(intent);
             } else {
-                // Tùy chọn: Thông báo cho người dùng
-                // Toast.makeText(v.getContext(), "Không có thông tin chi tiết cho phim này", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -89,11 +78,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return movies == null ? 0 : movies.size(); // An toàn hơn
     }
 
-    /**
-     * Cập nhật toàn bộ danh sách phim trong adapter.
-     * Dữ liệu cũ sẽ bị xóa.
-     * @param newMovies Danh sách phim mới để hiển thị.
-     */
     public void updateMovies(List<Movie> newMovies) {
         if (this.movies == null) {
             this.movies = new ArrayList<>();
@@ -102,14 +86,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         if (newMovies != null) {
             this.movies.addAll(newMovies);
         }
-        notifyDataSetChanged(); // Thông báo cho RecyclerView cập nhật toàn bộ giao diện
+        notifyDataSetChanged();
     }
 
-    /**
-     * Thêm một danh sách phim vào cuối danh sách hiện tại.
-     * Hữu ích cho việc triển khai tải thêm trang (pagination).
-     * @param additionalMovies Danh sách phim cần thêm.
-     */
     public void addMovies(List<Movie> additionalMovies) {
         if (additionalMovies != null && !additionalMovies.isEmpty()) {
             if (this.movies == null) {
@@ -121,11 +100,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         }
     }
 
-    /**
-     * Xóa tất cả các phim khỏi adapter.
-     * RecyclerView sẽ trở nên trống.
-     */
-    public void clearMovies() { // <<<< PHƯƠNG THỨC ĐƯỢC THÊM VÀO >>>>
+    public void clearMovies() {
         if (this.movies != null) {
             this.movies.clear();
             notifyDataSetChanged();
@@ -135,15 +110,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
         ImageView poster;
         TextView title;
-        // Bạn có thể thêm các View khác ở đây nếu item_movie.xml của bạn có
-        // ví dụ: TextView yearTextView;
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Đảm bảo các ID này khớp với ID trong file R.layout.item_movie của bạn
             poster = itemView.findViewById(R.id.poster);
             title = itemView.findViewById(R.id.title);
-            // yearTextView = itemView.findViewById(R.id.year); // Ví dụ
         }
     }
 }
