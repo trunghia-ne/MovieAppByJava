@@ -41,8 +41,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
             android:textColor="#FFD700"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textStyle="normal"
             tools:text="Kết quả cho: 'Action Movie'" />
 
         <FrameLayout
