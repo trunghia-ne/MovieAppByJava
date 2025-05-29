@@ -36,6 +36,7 @@ import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
 import com.example.movieappbyjava.model.PaymentUrlResponse;
+import com.example.movieappbyjava.network.ApiService;
 import com.example.movieappbyjava.network.KKPhimApi;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -403,164 +404,130 @@ public class DetailActivity2 extends AppCompatActivity {
             return;
         }
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = getUserId();
-        String username = getUserName();
+        Comment commentObj = new Comment();
+        commentObj.setUserId(getUserId());
+        commentObj.setUsername(getUserName());
+        commentObj.setMovieId(movieId);
+        commentObj.setMovieTitle(movieTitle);
+        commentObj.setRating(rating);
+        commentObj.setComment(comment);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", uid);
-        data.put("username", username);
-        data.put("rating", rating);
-        data.put("comment", comment);
-        data.put("movieId", movieId);
-        data.put("movieTitle", movieTitle);
-        data.put("timestamp", FieldValue.serverTimestamp());
+        ApiService.api.submitReview(commentObj).enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DetailActivity2.this, "Đánh giá thành công!", Toast.LENGTH_SHORT).show();
+                    ratingBar.setRating(0);
+                    editComment.setText("");
+                    btnDeleteRating.setVisibility(View.VISIBLE);
+                    btnSubmitRating.setText("Cập nhật đánh giá");
 
-        if (currentRatingId == null) {
-            // Add new rating
-            db.collection("reviews")
-                    .add(data)
-                    .addOnSuccessListener(documentReference -> {
-                        currentRatingId = documentReference.getId();
-                        Toast.makeText(this, "Đánh giá thành công!", Toast.LENGTH_SHORT).show();
-                        editComment.setText("");
-                        ratingBar.setRating(0);
-                        btnDeleteRating.setVisibility(View.VISIBLE);
+                    loadComments();
+                    updateRatingStats();
+                } else {
+                    Toast.makeText(DetailActivity2.this, "Lỗi gửi đánh giá", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                        // Add comment to list and update UI immediately
-                        Comment newComment = new Comment(username, comment, rating, new Date(), uid, movieTitle);
-                        commentAdapter.addComment(newComment);
-                        recyclerComments.scrollToPosition(0);
-
-                        updateRatingStats();
-                        updateCommentsUI();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("FIREBASE_ERROR", "Error adding rating", e);
-                    });
-        } else {
-            // Update existing rating
-            db.collection("reviews").document(currentRatingId)
-                    .update(data)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Cập nhật đánh giá thành công!", Toast.LENGTH_SHORT).show();
-                        editComment.setText("");
-                        ratingBar.setRating(0);
-                        loadComments();
-                        updateRatingStats();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("FIREBASE_ERROR", "Error updating rating", e);
-                    });
-        }
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Toast.makeText(DetailActivity2.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     private void deleteRating() {
         if (currentRatingId == null) return;
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews").document(currentRatingId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Xoá đánh giá thành công!", Toast.LENGTH_SHORT).show();
+        ApiService.api.deleteReview(currentRatingId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DetailActivity2.this, "Xoá đánh giá thành công!", Toast.LENGTH_SHORT).show();
                     currentRatingId = null;
                     btnDeleteRating.setVisibility(View.GONE);
-                    editComment.setText("");
                     ratingBar.setRating(0);
+                    editComment.setText("");
                     loadComments();
                     updateRatingStats();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("FIREBASE_ERROR", "Error deleting rating", e);
-                });
+                } else {
+                    Toast.makeText(DetailActivity2.this, "Lỗi xoá đánh giá", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(DetailActivity2.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     private void loadUserRating() {
-        String uid = getUserId();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        ApiService.api.getUserReview(getUserId(), movieId).enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Comment review = response.body();
+                    currentRatingId = review.getId();
+                    ratingBar.setRating((float) review.getRating());
+                    editComment.setText(review.getComment());
 
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .whereEqualTo("userId", uid)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                        currentRatingId = doc.getId();
+                    btnDeleteRating.setVisibility(View.VISIBLE);
+                    btnSubmitRating.setText("Cập nhật đánh giá");
+                }
+            }
 
-                        Double rating = doc.getDouble("rating");
-                        String comment = doc.getString("comment");
-
-                        if (rating != null) ratingBar.setRating(rating.floatValue());
-                        if (comment != null) editComment.setText(comment);
-
-                        btnDeleteRating.setVisibility(View.VISIBLE);
-                        btnSubmitRating.setText("Cập nhật đánh giá");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error loading user rating", e));
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Log.e("API", "Lỗi load user rating", t);
+            }
+        });
     }
 
+
     private void updateRatingStats() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int totalReviews = queryDocumentSnapshots.size();
+        ApiService.api.getAverageRating(movieId).enqueue(new Callback<Double>() {
+            @Override
+            public void onResponse(Call<Double> call, Response<Double> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    double avg = response.body();
+                    int total = commentsList.size(); // Hoặc nếu có riêng API count thì dùng cái đó
+                    textRatingStats.setText(String.format(Locale.getDefault(),
+                            "%.1f ⭐ | %d đánh giá", avg, total));
+                } else {
+                    textRatingStats.setText("Chưa có đánh giá");
+                }
+            }
 
-                    if (totalReviews > 0) {
-                        double totalRating = 0;
-                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                            Double rating = doc.getDouble("rating");
-                            if (rating != null) {
-                                totalRating += rating;
-                            }
-                        }
-
-                        double averageRating = totalRating / totalReviews;
-                        textRatingStats.setText(String.format(Locale.getDefault(),
-                                "%.1f ⭐ | %d đánh giá", averageRating, totalReviews));
-                    } else {
-                        textRatingStats.setText("Chưa có đánh giá");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error updating rating stats", e));
+            @Override
+            public void onFailure(Call<Double> call, Throwable t) {
+                Log.e("API", "Lỗi load điểm TB", t);
+            }
+        });
     }
 
     private void loadComments() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
+        ApiClient.getApiService().getReviews(movieId).enqueue(new Callback<List<Comment>>() {
+            @Override
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                if (response.isSuccessful() && response.body() != null) {
                     commentsList.clear();
-
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        String username = doc.getString("username");
-                        String comment = doc.getString("comment");
-                        Double rating = doc.getDouble("rating");
-                        Date timestamp = doc.getDate("timestamp");
-                        String userId = doc.getString("userId");
-                        String movieTitle = doc.getString("movieTitle");
-
-                        if (username != null && comment != null && rating != null && timestamp != null && userId != null) {
-                            Comment cmt = new Comment(username, comment, rating, timestamp, userId, movieTitle);
-                            commentsList.add(cmt);
-                        }
-                    }
-
+                    commentsList.addAll(response.body());
                     commentAdapter.notifyDataSetChanged();
                     updateCommentsUI();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Không thể tải bình luận", Toast.LENGTH_SHORT).show();
-                    Log.e("FIREBASE_ERROR", "Error loading comments", e);
-                });
+                } else {
+                    Toast.makeText(DetailActivity2.this, "Không thể tải bình luận", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
+                Toast.makeText(DetailActivity2.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                Log.e("API", "Lỗi tải bình luận", t);
+            }
+        });
     }
 
     private void updateCommentsUI() {

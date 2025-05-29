@@ -3,80 +3,60 @@ package com.example.movieappbyjava.model;
 import java.util.Date;
 
 public class Comment {
+    private String id;           // ID trên server, cần thiết cho update/delete
     private String username;
     private String comment;
-    private Date createdAt;
+    private Date timestamp;     // Thay createdAt để khớp với server
     private double rating;
     private String userId;
+    private String movieId;     // Thêm trường này để POST review
     private String movieTitle;
-    // Default constructor for Firebase
-    public Comment() {
-    }
 
-    public Comment(String username, String comment, double rating, Date createdAt) {
+    // Constructors
+    public Comment() {}
+
+    public Comment(String username, String comment, double rating, Date timestamp) {
         this.username = username;
         this.comment = comment;
         this.rating = rating;
-        this.createdAt = createdAt;
+        this.timestamp = timestamp;
     }
 
-
-    public Comment(String username, String comment, double rating, Date createdAt, String userId, String movieTitle) {
+    public Comment(String username, String comment, double rating, Date timestamp, String userId, String movieId, String movieTitle) {
         this.username = username;
         this.comment = comment;
         this.rating = rating;
-        this.createdAt = createdAt;
+        this.timestamp = timestamp;
         this.userId = userId;
+        this.movieId = movieId;
         this.movieTitle = movieTitle;
     }
 
     // Getters and setters
-    public String getUsername() {
-        return username;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public String getComment() {
-        return comment;
-    }
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+    public Date getTimestamp() { return timestamp; }
+    public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
-    public double getRating() {
-        return rating;
-    }
+    public String getMovieId() { return movieId; }
+    public void setMovieId(String movieId) { this.movieId = movieId; }
 
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
+    public String getMovieTitle() { return movieTitle; }
+    public void setMovieTitle(String movieTitle) { this.movieTitle = movieTitle; }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getMovieTitle() {
-        return movieTitle;
-    }
-    public void setMovieTitle(String movieTitle) {
-        this.movieTitle = movieTitle;
-    }
     // Generate avatar URL based on username
     public String getAvatarUrl() {
         if (username != null && !username.isEmpty()) {

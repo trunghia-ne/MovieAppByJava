@@ -71,8 +71,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.ratingUser.setRating((float) comment.getRating());
 
         // Set timestamp
-        if (comment.getCreatedAt() != null) {
-            String timeAgo = getTimeAgo(comment.getCreatedAt());
+        if (comment.getTimestamp() != null) {
+            String timeAgo = getTimeAgo(comment.getTimestamp());
             holder.textTime.setText(timeAgo);
         } else {
             holder.textTime.setText("Vừa xong");
