@@ -17,6 +17,9 @@
         tools:ignore="ExtraText"
         tools:targetApi="31">
         <activity
+            android:name=".SearchInputActivity"
+            android:exported="false" />
+        <activity
             android:name=".SearchResultsActivity"
             android:exported="false" />
         <activity
@@ -55,7 +58,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".network.PaymentResultActivity"
+        <activity
+            android:name=".network.PaymentResultActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -63,19 +67,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="movieapp" android:host="payment-success" />
+                <data
+                    android:host="payment-success"
+                    android:scheme="movieapp" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="movieapp" android:host="payment-failed" />
+                <data
+                    android:host="payment-failed"
+                    android:scheme="movieapp" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
