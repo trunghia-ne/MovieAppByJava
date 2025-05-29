@@ -57,6 +57,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailActivity2 extends AppCompatActivity {
 
     private ImageView imagePoster, btnWatchTrailer;
+    private View backToHome;
     private TextView textTitle, textSummary, textInfo;
     private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
     ScrollView contentLayout;
@@ -126,9 +127,14 @@ public class DetailActivity2 extends AppCompatActivity {
         textCommentsHeader = findViewById(R.id.textCommentsHeader);
         recyclerComments = findViewById(R.id.recyclerComments);
         layoutEmptyComments = findViewById(R.id.layoutEmptyComments);
+        backToHome = findViewById(R.id.backToHome);
 
         btnSubmitRating.setOnClickListener(v -> submitOrUpdateRating());
         btnDeleteRating.setOnClickListener(v -> deleteRating());
+        backToHome.setOnClickListener(v -> {
+            Intent intent = new Intent(DetailActivity2.this, HomeActaivity.class);
+            startActivity(intent);
+        });
     }
 
     private void setupRecyclerView() {
