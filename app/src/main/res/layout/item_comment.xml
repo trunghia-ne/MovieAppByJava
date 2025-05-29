@@ -1,46 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#111">
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="@drawable/bg_comment_item"
+    android:layout_marginBottom="8dp">
 
-    <TextView
-        android:id="@+id/textUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFD700"
-        android:textStyle="bold"
-        android:textSize="14sp" />
+    <!-- Avatar -->
+    <ImageView
+        android:id="@+id/imageAvatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_comment_item"
+        android:contentDescription="User Avatar" />
 
-    <!-- ✅ Thêm RatingBar hiển thị số sao -->
-    <RatingBar
-        android:id="@+id/ratingUser"
-        android:layout_width="wrap_content"
+    <!-- Comment Content -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:numStars="5"
-        android:stepSize="1.0"
-        android:isIndicator="true"
-        android:rating="3"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:layout_marginTop="4dp"
-        android:progressDrawable="@drawable/rating_bar_selector" />
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textComment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp" />
+        <!-- Username and Level -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/textTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#888888"
-        android:textSize="12sp"
-        android:layout_marginTop="2dp" />
+            <TextView
+                android:id="@+id/textUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#4A9EFF"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:text="Username" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lv.25"
+                android:textColor="#FFD700"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"
+                android:background="#333"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:layout_marginEnd="8dp" />
+
+        </LinearLayout>
+
+        <!-- Rating Stars -->
+        <RatingBar
+            android:id="@+id/ratingUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:isIndicator="true"
+            android:rating="3"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="-8dp"
+            style="?android:attr/ratingBarStyleSmall" />
+
+        <!-- Comment Text -->
+        <TextView
+            android:id="@+id/textComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:lineSpacingExtra="2dp"
+            android:text="This is a sample comment text that shows how the comment will look in the app." />
+
+        <!-- Time -->
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#888888"
+            android:textSize="11sp"
+            android:layout_marginTop="4dp"
+            android:text="Trả lời 2 phút trước" />
+
+    </LinearLayout>
+
 </LinearLayout>

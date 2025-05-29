@@ -241,7 +241,7 @@
                         android:id="@+id/textRatingStats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="8.7 || 29 đánh giá"
+                        android:text="Chưa có đánh giá"
                         android:textColor="#DDD"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -271,7 +271,6 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
-
                 <Button
                     android:id="@+id/btnDeleteRating"
                     android:layout_width="match_parent"
@@ -283,23 +282,66 @@
                     android:layout_marginBottom="12dp"
                     android:visibility="gone" />
 
+                <!-- Comments Section -->
+                <TextView
+                    android:id="@+id/textCommentsHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bình luận (0)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFD700"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerComments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="32dp"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="16dp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutEmptyComments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chưa có bình luận nào"
+                        android:textColor="#888"
+                        android:textSize="14sp"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hãy là người đầu tiên bình luận về phim này!"
+                        android:textColor="#666"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
+
     </ScrollView>
 
+    <!-- Loading Progress Bar -->
     <ProgressBar
         android:id="@+id/progressBarLoading"
-        style="?android:attr/progressBarStyleSmall"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:indeterminate="true"
         android:visibility="gone" />
+
 </FrameLayout>
