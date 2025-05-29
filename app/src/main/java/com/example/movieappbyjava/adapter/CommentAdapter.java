@@ -78,15 +78,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             holder.textTime.setText("Vừa xong");
         }
 
-        // Load avatar using Glide
-        Glide.with(holder.itemView.getContext())
-                .load(comment.getAvatarUrl())
-                .transform(new CircleCrop())
-                .placeholder(R.drawable.ic_user_placeholder)
-                .error(R.drawable.ic_user_placeholder)
-                .into(holder.imageAvatar);
+        // Load avatar - ưu tiên avatar từ comment, nếu không có thì dùng placeholder
+        String avatarUrl = comment.getAvatarUrl();
+        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(avatarUrl)
+                    .transform(new CircleCrop())
+                    .placeholder(R.drawable.ic_user_placeholder)
+                    .error(R.drawable.ic_user_placeholder)
+                    .into(holder.imageAvatar);
+        } else {
+            holder.imageAvatar.setImageResource(R.drawable.ic_user_placeholder);
+        }
     }
-
     @Override
     public int getItemCount() {
         return comments != null ? comments.size() : 0;
