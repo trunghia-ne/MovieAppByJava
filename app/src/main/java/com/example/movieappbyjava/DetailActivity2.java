@@ -12,7 +12,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -38,9 +36,9 @@ import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
 import com.example.movieappbyjava.model.PaymentUrlResponse;
+import com.example.movieappbyjava.network.ApiService;
 import com.example.movieappbyjava.network.KKPhimApi;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -61,12 +59,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-
 public class DetailActivity2 extends AppCompatActivity {
-
     private ImageView imagePoster, btnWatchTrailer;
-    private ImageButton btnBack, btnFav;
+    private View backToHome;
     private TextView textTitle, textSummary, textInfo;
     private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
     ScrollView contentLayout;
@@ -80,7 +75,7 @@ public class DetailActivity2 extends AppCompatActivity {
     private RecyclerView recyclerComments;
     private View layoutEmptyComments;
     private String currentRatingId = null;
-    private String movieId;
+    private String movieSlug; // ✅ Đổi từ movieId thành movieSlug
     private String movieTitle;
     private CommentAdapter commentAdapter;
     private List<Comment> commentsList = new ArrayList<>();
@@ -108,6 +103,7 @@ public class DetailActivity2 extends AppCompatActivity {
             return;
         }
 
+        movieSlug = slug; // ✅ Lưu slug
         fetchMovieDetail(slug);
     }
 
@@ -136,43 +132,20 @@ public class DetailActivity2 extends AppCompatActivity {
         textCommentsHeader = findViewById(R.id.textCommentsHeader);
         recyclerComments = findViewById(R.id.recyclerComments);
         layoutEmptyComments = findViewById(R.id.layoutEmptyComments);
-        btnBack = findViewById(R.id.btnBack);
-        btnFav = findViewById(R.id.btnFav);
+        backToHome = findViewById(R.id.backToHome);
 
         btnSubmitRating.setOnClickListener(v -> submitOrUpdateRating());
         btnDeleteRating.setOnClickListener(v -> deleteRating());
-        btnBack.setOnClickListener(v -> {
+        backToHome.setOnClickListener(v -> {
             Intent intent = new Intent(DetailActivity2.this, HomeActaivity.class);
             startActivity(intent);
         });
-
-        ImageButton btnFav = findViewById(R.id.btnFav);
-
-        btnFav.setOnClickListener(v -> {
-            showCollectionDialog();
-        });
-
     }
-
-    private void showCollectionDialog() {
-        String[] collections = {"Yêu thích", "Muốn xem", "Đã xem", "Hài hước", "Hành động"};
-
-        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle("Chọn bộ sưu tập");
-
-        builder.setSingleChoiceItems(collections, -1, (dialog, which) -> {
-            String selected = collections[which];
-            Toast.makeText(this, "Đã thêm vào: " + selected, Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        builder.setNegativeButton("Hủy", null);
-        builder.show();
-    }
-
 
     private void setupRecyclerView() {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String currentUserId = currentUser != null ? currentUser.getUid() : "";
+
         commentAdapter = new CommentAdapter(commentsList, currentUserId);
         recyclerComments.setLayoutManager(new LinearLayoutManager(this));
         recyclerComments.setAdapter(commentAdapter);
@@ -198,7 +171,7 @@ public class DetailActivity2 extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     Movie movie = response.body().getMovie();
-                    movieId = slug;
+                    movieSlug = slug; // ✅ Lưu slug
                     movieTitle = movie.getName();
 
                     setupMovieDetails(movie, response.body());
@@ -410,198 +383,231 @@ public class DetailActivity2 extends AppCompatActivity {
         return chip;
     }
 
-    private String getUserId() {
-        return getSharedPreferences("users", MODE_PRIVATE).getString("uid", "anonymous_" + System.currentTimeMillis());
+    private void loadUserRating() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null || movieSlug == null) return;
+
+        String userId = currentUser.getUid();
+
+        ApiClient.getApiService().getUserReview(userId, movieSlug).enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Comment existingComment = response.body();
+                    currentRatingId = existingComment.getId();
+
+                    // Hiển thị đánh giá hiện có
+                    ratingBar.setRating((float) existingComment.getRating());
+                    editComment.setText(existingComment.getComment());
+
+                    // Đổi text button
+                    btnSubmitRating.setText("Cập nhật đánh giá");
+                    btnDeleteRating.setVisibility(View.VISIBLE);
+
+                    Log.d("USER_RATING", "Tải thành công đánh giá hiện có");
+                } else {
+                    // Chưa có đánh giá
+                    btnSubmitRating.setText("Gửi đánh giá");
+                    btnDeleteRating.setVisibility(View.GONE);
+                    currentRatingId = null;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Log.e("USER_RATING", "Lỗi khi tải đánh giá người dùng: " + t.getMessage());
+            }
+        });
     }
 
-    private String getUserName() {
-        String username = getSharedPreferences("users", MODE_PRIVATE).getString("username", null);
-        return username != null ? username : "Người dùng " + System.currentTimeMillis();
-    }
-
+    // ✅ Cập nhật để sử dụng slug
     private void submitOrUpdateRating() {
-        String comment = editComment.getText().toString().trim();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        String commentText = editComment.getText().toString().trim();
         float rating = ratingBar.getRating();
 
-        if (TextUtils.isEmpty(comment)) {
+        if (TextUtils.isEmpty(commentText)) {
             Toast.makeText(this, "Vui lòng nhập bình luận", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (rating == 0) {
-            Toast.makeText(this, "Vui lòng đánh giá sao", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng chọn rating", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = getUserId();
-        String username = getUserName();
+        // Tạo comment object
+        Comment comment = new Comment();
+        comment.setUserId(currentUser.getUid());
+        comment.setUsername(currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "Người dùng");
+        comment.setComment(commentText);
+        comment.setRating(rating);
+        comment.setSlug(movieSlug); // ✅ Sử dụng slug
+        comment.setMovieTitle(movieTitle);
+        comment.setTimestamp(new Date());
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", uid);
-        data.put("username", username);
-        data.put("rating", rating);
-        data.put("comment", comment);
-        data.put("movieId", movieId);
-        data.put("movieTitle", movieTitle);
-        data.put("timestamp", FieldValue.serverTimestamp());
-
-        if (currentRatingId == null) {
-            // Add new rating
-            db.collection("reviews")
-                    .add(data)
-                    .addOnSuccessListener(documentReference -> {
-                        currentRatingId = documentReference.getId();
-                        Toast.makeText(this, "Đánh giá thành công!", Toast.LENGTH_SHORT).show();
-                        editComment.setText("");
-                        ratingBar.setRating(0);
-                        btnDeleteRating.setVisibility(View.VISIBLE);
-
-                        // Add comment to list and update UI immediately
-                        Comment newComment = new Comment(username, comment, rating, new Date(), uid, movieTitle);
-                        commentAdapter.addComment(newComment);
-                        recyclerComments.scrollToPosition(0);
-
-                        updateRatingStats();
-                        updateCommentsUI();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("FIREBASE_ERROR", "Error adding rating", e);
-                    });
-        } else {
-            // Update existing rating
-            db.collection("reviews").document(currentRatingId)
-                    .update(data)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Cập nhật đánh giá thành công!", Toast.LENGTH_SHORT).show();
-                        editComment.setText("");
-                        ratingBar.setRating(0);
-                        loadComments();
-                        updateRatingStats();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("FIREBASE_ERROR", "Error updating rating", e);
-                    });
+        if (currentRatingId != null) {
+            comment.setId(currentRatingId);
         }
-    }
 
-    private void deleteRating() {
-        if (currentRatingId == null) return;
+        ApiClient.getApiService().submitReview(comment).enqueue(new Callback<Comment>() {
+            @Override
+            public void onResponse(Call<Comment> call, Response<Comment> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Comment savedComment = response.body();
+                    currentRatingId = savedComment.getId();
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews").document(currentRatingId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Xoá đánh giá thành công!", Toast.LENGTH_SHORT).show();
-                    currentRatingId = null;
-                    btnDeleteRating.setVisibility(View.GONE);
-                    editComment.setText("");
-                    ratingBar.setRating(0);
+                    // Update UI
+                    btnSubmitRating.setText("Cập nhật đánh giá");
+                    btnDeleteRating.setVisibility(View.VISIBLE);
+
+                    Toast.makeText(DetailActivity2.this, "Đánh giá đã được lưu!", Toast.LENGTH_SHORT).show();
+
+                    // ✅ Refresh danh sách comment và rating stats
                     loadComments();
                     updateRatingStats();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("FIREBASE_ERROR", "Error deleting rating", e);
-                });
+                } else {
+                    Toast.makeText(DetailActivity2.this, "Lỗi khi lưu đánh giá", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Comment> call, Throwable t) {
+                Toast.makeText(DetailActivity2.this, "Không thể kết nối server", Toast.LENGTH_SHORT).show();
+                Log.e("SUBMIT_RATING", "Error: " + t.getMessage());
+            }
+        });
     }
 
-    private void loadUserRating() {
-        String uid = getUserId();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+    // ✅ Xóa đánh giá
+    private void deleteRating() {
+        if (currentRatingId == null) {
+            Toast.makeText(this, "Không có đánh giá để xóa", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .whereEqualTo("userId", uid)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                        currentRatingId = doc.getId();
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xóa đánh giá")
+                .setMessage("Bạn có chắc muốn xóa đánh giá này?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    ApiClient.getApiService().deleteReview(currentRatingId).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                // Reset UI
+                                ratingBar.setRating(0);
+                                editComment.setText("");
+                                btnSubmitRating.setText("Gửi đánh giá");
+                                btnDeleteRating.setVisibility(View.GONE);
+                                currentRatingId = null;
 
-                        Double rating = doc.getDouble("rating");
-                        String comment = doc.getString("comment");
+                                Toast.makeText(DetailActivity2.this, "Đã xóa đánh giá", Toast.LENGTH_SHORT).show();
 
-                        if (rating != null) ratingBar.setRating(rating.floatValue());
-                        if (comment != null) editComment.setText(comment);
-
-                        btnDeleteRating.setVisibility(View.VISIBLE);
-                        btnSubmitRating.setText("Cập nhật đánh giá");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error loading user rating", e));
-    }
-
-    private void updateRatingStats() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int totalReviews = queryDocumentSnapshots.size();
-
-                    if (totalReviews > 0) {
-                        double totalRating = 0;
-                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                            Double rating = doc.getDouble("rating");
-                            if (rating != null) {
-                                totalRating += rating;
+                                // ✅ Refresh danh sách comment và rating stats
+                                loadComments();
+                                updateRatingStats();
+                            } else {
+                                Toast.makeText(DetailActivity2.this, "Lỗi khi xóa đánh giá", Toast.LENGTH_SHORT).show();
                             }
                         }
 
-                        double averageRating = totalRating / totalReviews;
-                        textRatingStats.setText(String.format(Locale.getDefault(),
-                                "%.1f ⭐ | %d đánh giá", averageRating, totalReviews));
-                    } else {
-                        textRatingStats.setText("Chưa có đánh giá");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FIREBASE_ERROR", "Error updating rating stats", e));
-    }
-
-    private void loadComments() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("reviews")
-                .whereEqualTo("movieId", movieId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    commentsList.clear();
-
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        String username = doc.getString("username");
-                        String comment = doc.getString("comment");
-                        Double rating = doc.getDouble("rating");
-                        Date timestamp = doc.getDate("timestamp");
-                        String userId = doc.getString("userId");
-                        String movieTitle = doc.getString("movieTitle");
-
-                        if (username != null && comment != null && rating != null && timestamp != null && userId != null) {
-                            Comment cmt = new Comment(username, comment, rating, timestamp, userId, movieTitle);
-                            commentsList.add(cmt);
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(DetailActivity2.this, "Không thể kết nối server", Toast.LENGTH_SHORT).show();
                         }
-                    }
-
-                    commentAdapter.notifyDataSetChanged();
-                    updateCommentsUI();
+                    });
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Không thể tải bình luận", Toast.LENGTH_SHORT).show();
-                    Log.e("FIREBASE_ERROR", "Error loading comments", e);
-                });
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
-    private void updateCommentsUI() {
-        if (commentsList.isEmpty()) {
-            layoutEmptyComments.setVisibility(View.VISIBLE);
-            recyclerComments.setVisibility(View.GONE);
-            textCommentsHeader.setText("Chưa có bình luận");
-        } else {
-            layoutEmptyComments.setVisibility(View.GONE);
-            recyclerComments.setVisibility(View.VISIBLE);
-            textCommentsHeader.setText("Bình luận (" + commentsList.size() + ")");
-        }
+    // ✅ Cập nhật để sử dụng slug
+    private void updateRatingStats() {
+        if (movieSlug == null) return;
+
+        ApiClient.getApiService().getAverageRating(movieSlug).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, Object> result = response.body();
+
+                    Object avgObj = result.get("average");
+                    Object countObj = result.get("count");
+
+                    double average = 0.0;
+                    int count = 0;
+
+                    if (avgObj instanceof Double) {
+                        average = (Double) avgObj;
+                    } else if (avgObj instanceof Integer) {
+                        average = ((Integer) avgObj).doubleValue();
+                    }
+
+                    if (countObj instanceof Integer) {
+                        count = (Integer) countObj;
+                    } else if (countObj instanceof Double) {
+                        count = ((Double) countObj).intValue();
+                    }
+
+                    String statsText = String.format(Locale.getDefault(),
+                            "⭐ %.1f/5 (%d đánh giá)", average, count);
+                    textRatingStats.setText(statsText);
+
+                    Log.d("RATING_STATS", "Average: " + average + ", Count: " + count);
+                } else {
+                    textRatingStats.setText("⭐ Chưa có đánh giá");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Log.e("RATING_STATS", "Error: " + t.getMessage());
+                textRatingStats.setText("⭐ Lỗi tải thống kê");
+            }
+        });
+    }
+
+    // ✅ Cập nhật để sử dụng slug
+    private void loadComments() {
+        if (movieSlug == null) return;
+
+        Log.d("DEBUG_SLUG", "Slug gọi API là: " + movieSlug);
+        ApiClient.getApiService().getReviews(movieSlug).enqueue(new Callback<List<Comment>>() {
+            @Override
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Comment> comments = response.body();
+
+                    if (comments.isEmpty()) {
+                        layoutEmptyComments.setVisibility(View.VISIBLE);
+                        recyclerComments.setVisibility(View.GONE);
+                        textCommentsHeader.setText("Bình luận (0)");
+                    } else {
+                        layoutEmptyComments.setVisibility(View.GONE);
+                        recyclerComments.setVisibility(View.VISIBLE);
+                        textCommentsHeader.setText("Bình luận (" + comments.size() + ")");
+
+                        // ✅ Cập nhật danh sách comment
+                        commentAdapter.updateComments(comments);
+                    }
+
+                    Log.d("LOAD_COMMENTS", "Tải thành công " + comments.size() + " bình luận");
+                } else {
+                    layoutEmptyComments.setVisibility(View.VISIBLE);
+                    recyclerComments.setVisibility(View.GONE);
+                    textCommentsHeader.setText("Bình luận (0)");
+                    Log.e("LOAD_COMMENTS", "Response not successful: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
+                Log.e("LOAD_COMMENTS", "Error loading comments: " + t.getMessage());
+                layoutEmptyComments.setVisibility(View.VISIBLE);
+                recyclerComments.setVisibility(View.GONE);
+                textCommentsHeader.setText("Bình luận (Lỗi tải)");
+            }
+        });
     }
 }

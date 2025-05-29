@@ -58,10 +58,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         // ✅ Đánh dấu "(Bạn)" nếu là người dùng hiện tại
         if (comment.getUserId() != null && comment.getUserId().equals(currentUserId)) {
             holder.textUser.setText(comment.getUsername() + " (Bạn)");
-            holder.textUser.setTextColor(Color.BLUE);
+            holder.textUser.setTextColor(Color.parseColor("#2196F3")); // Màu xanh
         } else {
             holder.textUser.setText(comment.getUsername() != null ? comment.getUsername() : "Người dùng ẩn danh");
-            holder.textUser.setTextColor(Color.BLACK); // Màu mặc định
+            holder.textUser.setTextColor(Color.parseColor("#333333")); // Màu đen
         }
 
         // Set comment text
@@ -71,8 +71,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.ratingUser.setRating((float) comment.getRating());
 
         // Set timestamp
-        if (comment.getCreatedAt() != null) {
-            String timeAgo = getTimeAgo(comment.getCreatedAt());
+        if (comment.getTimestamp() != null) {
+            String timeAgo = getTimeAgo(comment.getTimestamp());
             holder.textTime.setText(timeAgo);
         } else {
             holder.textTime.setText("Vừa xong");
@@ -89,7 +89,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return comments.size();
+        return comments != null ? comments.size() : 0;
     }
 
     // Helper method to format time ago
@@ -100,13 +100,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             return "Vừa xong";
         } else if (timeAgo < 3600000) {
             int minutes = (int) (timeAgo / 60000);
-            return "Trả lời " + minutes + " phút trước";
+            return minutes + " phút trước";
         } else if (timeAgo < 86400000) {
             int hours = (int) (timeAgo / 3600000);
-            return "Trả lời " + hours + " giờ trước";
+            return hours + " giờ trước";
         } else if (timeAgo < 604800000) {
             int days = (int) (timeAgo / 86400000);
-            return "Trả lời " + days + " ngày trước";
+            return days + " ngày trước";
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
             return sdf.format(date);
@@ -115,14 +115,42 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     // Method to add new comment and notify adapter
     public void addComment(Comment comment) {
-        comments.add(0, comment);
-        notifyItemInserted(0);
+        if (comments != null) {
+            comments.add(0, comment);
+            notifyItemInserted(0);
+        }
+    }
+
+    // Method to update a specific comment
+    public void updateComment(Comment updatedComment) {
+        if (comments != null) {
+            for (int i = 0; i < comments.size(); i++) {
+                Comment comment = comments.get(i);
+                if (comment.getUserId() != null && comment.getUserId().equals(updatedComment.getUserId())) {
+                    comments.set(i, updatedComment);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
     }
 
     // Method to update comments list
     public void updateComments(List<Comment> newComments) {
-        comments.clear();
-        comments.addAll(newComments);
-        notifyDataSetChanged();
+        if (comments != null) {
+            comments.clear();
+            if (newComments != null) {
+                comments.addAll(newComments);
+            }
+            notifyDataSetChanged();
+        }
+    }
+
+    // Method to clear all comments
+    public void clearComments() {
+        if (comments != null) {
+            comments.clear();
+            notifyDataSetChanged();
+        }
     }
 }

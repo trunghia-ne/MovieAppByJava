@@ -1,18 +1,40 @@
-package com.example.movieappbyjava.network;
+    package com.example.movieappbyjava.network;
 
-import com.example.movieappbyjava.model.PaymentUrlResponse;
+    import com.example.movieappbyjava.model.Comment;
+    import com.example.movieappbyjava.model.PaymentUrlResponse;
 
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
+    import java.util.List;
+    import java.util.Map;
 
-public interface ApiService {
-    @GET("hello")
-    Call<String> getHello();
+    import retrofit2.Call;
+    import retrofit2.Retrofit;
+    import retrofit2.converter.gson.GsonConverterFactory;
+    import retrofit2.http.Body;
+    import retrofit2.http.DELETE;
+    import retrofit2.http.GET;
+    import retrofit2.http.POST;
+    import retrofit2.http.Path;
+    import retrofit2.http.Query;
 
-    @POST("/api/pay")
-    Call<PaymentUrlResponse> createPayment(@Query("amount") int amount, @Query("userId") String userId);
+    public interface ApiService {
+        @GET("hello")
+        Call<String> getHello();
 
+        @POST("/api/pay")
+        Call<PaymentUrlResponse> createPayment(@Query("amount") int amount, @Query("userId") String userId);
+        @GET("api/reviews/{slug}")
+        Call<List<Comment>> getReviews(@Path("slug") String slug);
 
-}
+        @GET("api/reviews/{slug}/average")
+        Call<Map<String, Object>> getAverageRating(@Path("slug") String slug);
+
+        @POST("api/reviews")
+        Call<Comment> submitReview(@Body Comment comment);
+
+        @GET("api/reviews/user/{userId}/movie/{slug}")
+        Call<Comment> getUserReview(@Path("userId") String userId, @Path("slug") String slug);
+
+        @DELETE("api/reviews/{reviewId}")
+        Call<Void> deleteReview(@Path("reviewId") String reviewId);
+
+    }
