@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,14 +29,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.movieappbyjava.adapter.CommentAdapter;
+import com.example.movieappbyjava.model.ApiClient;
 import com.example.movieappbyjava.model.Category;
 import com.example.movieappbyjava.model.Comment;
 import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
+import com.example.movieappbyjava.model.PaymentUrlResponse;
 import com.example.movieappbyjava.network.KKPhimApi;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -269,16 +273,94 @@ public class DetailActivity2 extends AppCompatActivity {
                 lp.setMargins(12, 10, 12, 10);
                 epView.setLayoutParams(lp);
 
+                // 👉 Click để mở WatchActivity
                 epView.setOnClickListener(v -> {
-                    Intent intent = new Intent(DetailActivity2.this, WatchActivity.class);
-                    intent.putExtra("video_url", episode.getLink_embed());
-                    startActivity(intent);
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (currentUser == null) {
+                        Toast.makeText(DetailActivity2.this, "Bạn cần đăng nhập để xem phim", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String userId = currentUser.getUid();
+
+                    FirebaseFirestore.getInstance()
+                            .collection("payments")
+                            .whereEqualTo("userId", userId)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                if (!querySnapshot.isEmpty()) {
+                                    DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                                    Boolean paid = document.getBoolean("paid");
+                                    if (paid != null && paid) {
+                                        // Đã thanh toán
+                                        Intent intent = new Intent(DetailActivity2.this, WatchActivity.class);
+                                        intent.putExtra("video_url", episode.getLink_embed());
+                                        startActivity(intent);
+                                    } else {
+                                        // Chưa thanh toán
+                                        showPaymentDialog();
+                                    }
+                                } else {
+                                    // Không tìm thấy thông tin thanh toán
+                                    showPaymentDialog();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(DetailActivity2.this, "Lỗi kiểm tra thanh toán", Toast.LENGTH_SHORT).show();
+                            });
                 });
 
                 layoutEpisodes.addView(epView);
             }
         }
+
     }
+    private void showPaymentDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(DetailActivity2.this)
+                .setTitle("Bạn cần mua gói xem phim")
+                .setMessage("Vui lòng thanh toán để tiếp tục xem phim.")
+                .setPositiveButton("Thanh toán", (dialog, which) -> {
+                    callPaymentApiAndOpenUrl();
+                })
+                .setNegativeButton("Không", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void callPaymentApiAndOpenUrl() {
+        int amount = 100000; // Số tiền thanh toán, có thể lấy từ server hoặc cố định
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+        String userId = user.getUid();
+        ApiClient.getApiService().createPayment(amount, userId).enqueue(new Callback<PaymentUrlResponse>() {
+            @Override
+            public void onResponse(Call<PaymentUrlResponse> call, Response<PaymentUrlResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String paymentUrl = response.body().getPaymentUrl();
+                    if (paymentUrl != null && !paymentUrl.isEmpty()) {
+                        // Mở trang thanh toán VNPay bằng trình duyệt (hoặc WebView nếu bạn muốn)
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl));
+                        startActivity(browserIntent);
+                    } else {
+                        Toast.makeText(DetailActivity2.this, "URL thanh toán không hợp lệ", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(DetailActivity2.this, "Lỗi lấy link thanh toán", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaymentUrlResponse> call, Throwable t) {
+                Toast.makeText(DetailActivity2.this, "Lỗi kết nối server", Toast.LENGTH_SHORT).show();
+                Log.e("PaymentAPI", t.getMessage());
+            }
+        });
+    }
+
 
     private TextView createChip(String text) {
         TextView chip = new TextView(this);
