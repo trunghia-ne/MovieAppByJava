@@ -7,12 +7,11 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+
 public interface ApiService {
-    @GET("hello")
+    @GET("/api/hello")
     Call<String> getHello();
-
-    @POST("/api/pay")
-    Call<PaymentUrlResponse> createPayment(@Query("amount") int amount, @Query("userId") String userId);
-
-
 }
