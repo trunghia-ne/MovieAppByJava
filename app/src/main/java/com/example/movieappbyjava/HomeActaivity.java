@@ -52,8 +52,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
         private List<Movie> animeMovies = new ArrayList<>();
         private List<Movie> tvShowMovies = new ArrayList<>();
 
-        private EditText searchEditText; // <<<< THÊM BIẾN CHO EDITTEXT TÌM KIẾM
-        private KKPhimApi api;           // <<<< ĐƯA BIẾN API RA LÀM BIẾN TOÀN CỤC CỦA CLASS
+        private EditText searchEditText;
+        private KKPhimApi api;
 
 
         // Phương thức setupMovieSection của bạn giữ nguyên

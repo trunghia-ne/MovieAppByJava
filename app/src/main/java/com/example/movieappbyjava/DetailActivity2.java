@@ -12,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -39,6 +41,7 @@ import com.example.movieappbyjava.model.PaymentUrlResponse;
 import com.example.movieappbyjava.network.ApiService;
 import com.example.movieappbyjava.network.KKPhimApi;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -59,10 +62,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
+
 public class DetailActivity2 extends AppCompatActivity {
 
     private ImageView imagePoster, btnWatchTrailer;
-    private View backToHome;
+    private ImageButton btnBack, btnFav;
     private TextView textTitle, textSummary, textInfo;
     private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
     ScrollView contentLayout;
@@ -132,15 +137,40 @@ public class DetailActivity2 extends AppCompatActivity {
         textCommentsHeader = findViewById(R.id.textCommentsHeader);
         recyclerComments = findViewById(R.id.recyclerComments);
         layoutEmptyComments = findViewById(R.id.layoutEmptyComments);
-        backToHome = findViewById(R.id.backToHome);
+        btnBack = findViewById(R.id.btnBack);
+        btnFav = findViewById(R.id.btnFav);
 
         btnSubmitRating.setOnClickListener(v -> submitOrUpdateRating());
         btnDeleteRating.setOnClickListener(v -> deleteRating());
-        backToHome.setOnClickListener(v -> {
+        btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(DetailActivity2.this, HomeActaivity.class);
             startActivity(intent);
         });
+
+        ImageButton btnFav = findViewById(R.id.btnFav);
+
+        btnFav.setOnClickListener(v -> {
+            showCollectionDialog();
+        });
+
     }
+
+    private void showCollectionDialog() {
+        String[] collections = {"Yêu thích", "Muốn xem", "Đã xem", "Hài hước", "Hành động"};
+
+        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle("Chọn bộ sưu tập");
+
+        builder.setSingleChoiceItems(collections, -1, (dialog, which) -> {
+            String selected = collections[which];
+            Toast.makeText(this, "Đã thêm vào: " + selected, Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        builder.setNegativeButton("Hủy", null);
+        builder.show();
+    }
+
 
     private void setupRecyclerView() {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();

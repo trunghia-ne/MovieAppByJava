@@ -69,7 +69,6 @@
                     android:visibility="gone" />
 
                 <View
-                    android:id="@+id/backToHome"
                     android:layout_width="match_parent"
                     android:layout_height="400dp"
                     android:layout_alignParentBottom="true"
