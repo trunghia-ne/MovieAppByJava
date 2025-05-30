@@ -58,8 +58,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".network.PaymentResultActivity"
+        <activity android:name=".WatchActivity$PaymentResultActivity"
+
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

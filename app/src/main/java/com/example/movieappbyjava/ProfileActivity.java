@@ -2,10 +2,9 @@ package com.example.movieappbyjava;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,13 +12,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.movieappbyjava.model.ApiClient;
+import com.example.movieappbyjava.model.User;
+import com.example.movieappbyjava.network.UserApi;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
     String[] menuItems = {"My Account", "Your Favorites", "History Watched", "Logout"};
     private TextView tvUserName;
+
     int[] icons = {
             R.drawable.ic_user,
             R.drawable.ic_favorite,
@@ -27,11 +32,15 @@ public class ProfileActivity extends AppCompatActivity {
             R.drawable.ic_logout
     };
 
+    private UserApi userApi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("MyAccount", "MyAccountActivity started");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -52,23 +61,37 @@ public class ProfileActivity extends AppCompatActivity {
                     startActivity(new Intent(ProfileActivity.this, Favorites.class));
                     break;
                 case "Logout":
-                    finish(); // hoặc chuyển về LoginActivity
+                    FirebaseAuth.getInstance().signOut();
+                    finish(); // hoặc chuyển sang LoginActivity
                     break;
             }
         });
 
-        tvUserName = findViewById(R.id.tvUserName);
+        TextView tvUserName = findViewById(R.id.tvUserName);
+        TextView tvPhone = findViewById(R.id.tvPhone); // thêm dòng này
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            FirebaseFirestore.getInstance().collection("users").document(user.getUid()).get()
-                    .addOnSuccessListener(doc -> {
-                        String name = (doc.exists() && doc.contains("name")) ? doc.getString("name") : "Tên người dùng";
-                        tvUserName.setText(name);
-                    })
-                    .addOnFailureListener(e -> tvUserName.setText("Tên người dùng"));
-        } else {
-            tvUserName.setText("Tên người dùng");
-        }
+        userApi = ApiClient.getUserApi();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        Call<User> call = userApi.getUserById(userId);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    tvUserName.setText(user.getUsername());
+                    tvPhone.setText(user.getPhone()); // cập nhật số điện thoại từ API
+                } else {
+                    tvUserName.setText("Tên người dùng");
+                    tvPhone.setText("Không rõ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                tvUserName.setText("Tên người dùng");
+                tvPhone.setText("Không rõ");
+            }
+        });
     }
 }
