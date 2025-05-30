@@ -6,37 +6,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_color"
+    android:fitsSystemWindows="true"
     tools:context=".HomeActaivity">
 
-    <!-- Nội dung cuộn -->
-    <ScrollView
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout_home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_color"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_home"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="@string/app_name"
+            app:titleTextAppearance="@style/ToolbarTitleText"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top"
-        android:layout_marginBottom="80dp"> <!-- chừa chỗ cho menu -->
+        android:layout_marginBottom="80dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp">
 
-            <!-- Thanh tìm kiếm -->
-            <EditText
-                android:id="@+id/searchText"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:ems="10"
-                android:background="@drawable/edit_background"
-                android:inputType="text"
-                android:drawableStart="@drawable/search"
-                android:drawablePadding="8dp"
-                android:padding="12dp"
-                android:drawableEnd="@drawable/microphone"
-                android:hint="Search Movie..."
-                android:textColorHint="@color/white" />
-
-            <!-- ViewPager banner -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
@@ -48,22 +57,17 @@
                 <com.denzcoskun.imageslider.ImageSlider
                     android:id="@+id/imageSlider"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
+                    android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>
 
-
-
-
-            <!-- Best Movies -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Best Movies"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerBestMovies"
@@ -72,16 +76,14 @@
                 android:layout_marginTop="8dp"
                 android:overScrollMode="never" />
 
-
-            <!-- Category Tabs -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Category"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -99,39 +101,34 @@
                         android:id="@+id/tab_all"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="All"
-                        android:textColor="#FFD700"
-                        android:padding="8dp"
                         android:layout_marginEnd="12dp"
                         android:clickable="true"
-                        android:focusable="true" />
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="All"
+                        android:textColor="#FFD700" />
 
                     <TextView
                         android:id="@+id/tab_drama"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Drama"
-                        android:textColor="#FFD700"
-                        android:padding="8dp"
                         android:layout_marginEnd="12dp"
                         android:clickable="true"
-                        android:focusable="true" />
-
-                    <!-- Thêm các category khác -->
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Drama"
+                        android:textColor="#FFD700" />
                 </LinearLayout>
             </HorizontalScrollView>
 
-
-
-            <!-- Single Movie -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Single Movies"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSingleMovies"
@@ -140,15 +137,14 @@
                 android:layout_marginTop="8dp"
                 android:overScrollMode="never" />
 
-            <!-- Serias Movies -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Series Movies"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSeriesMovies"
@@ -157,15 +153,14 @@
                 android:layout_marginTop="8dp"
                 android:overScrollMode="never" />
 
-            <!-- Anime Movies -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="Anime Movies"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerAnimeMovies"
@@ -174,15 +169,14 @@
                 android:layout_marginTop="8dp"
                 android:overScrollMode="never" />
 
-            <!-- TV Shows -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="TV Shows"
                 android:textColor="#FFD700"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp" />
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerTvShowMovies"
@@ -190,9 +184,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:overScrollMode="never" />
-        </LinearLayout>
-    </ScrollView>
 
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <View
         android:layout_width="match_parent"
@@ -200,17 +194,16 @@
         android:layout_gravity="bottom"
         android:background="#1A1725" />
 
-    <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="@drawable/bg_bottom_nav_inline"
         android:elevation="8dp"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/color_selector"
         app:itemTextColor="@color/color_selector"
-        android:background="@drawable/bg_bottom_nav_inline" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
