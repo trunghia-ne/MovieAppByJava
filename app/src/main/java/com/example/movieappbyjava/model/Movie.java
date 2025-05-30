@@ -23,6 +23,21 @@ public class Movie {
     private List<Category> category;
     private List<Country> country;
 
+    public Movie() {
+
+    }
+    public Movie(String name, String slug) {
+        this.name = name;
+        this.slug = slug;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
     public String getId() { return _id; }
     public String getName() { return name; }
     public String getSlug() { return slug; }
