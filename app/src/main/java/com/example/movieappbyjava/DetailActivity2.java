@@ -12,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -31,7 +33,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.movieappbyjava.adapter.CommentAdapter;
 import com.example.movieappbyjava.model.ApiClient;
+import com.example.movieappbyjava.model.ApiResponse;
+import com.example.movieappbyjava.model.ApiResponseMessage;
 import com.example.movieappbyjava.model.Category;
+import com.example.movieappbyjava.model.CollectionFilm;
 import com.example.movieappbyjava.model.Comment;
 import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
@@ -63,13 +68,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailActivity2 extends AppCompatActivity {
     private ImageView imagePoster, btnWatchTrailer;
-    private View backToHome;
+    private ImageButton btnBack, btnFav;
     private TextView textTitle, textSummary, textInfo;
     private FlexboxLayout layoutGenres, layoutActors, layoutDirectors, layoutEpisodes;
     private LinearLayout contentLayout;
-
     ProgressBar progressBarLoading;
-
     WebView webTrailer;
     private RatingBar ratingBar;
     private EditText editComment;
@@ -78,7 +81,7 @@ public class DetailActivity2 extends AppCompatActivity {
     private RecyclerView recyclerComments;
     private View layoutEmptyComments;
     private String currentRatingId = null;
-    private String movieSlug; // ✅ Đổi từ movieId thành movieSlug
+    private String movieSlug, movieName; // ✅ Đổi từ movieId thành movieSlug
     private String movieTitle;
     private CommentAdapter commentAdapter;
     private List<Comment> commentsList = new ArrayList<>();
@@ -100,6 +103,7 @@ public class DetailActivity2 extends AppCompatActivity {
         setupRecyclerView();
 
         String slug = getIntent().getStringExtra("movie_slug");
+        String movieTitle = getIntent().getStringExtra("movie_name");
         if (slug == null) {
             Toast.makeText(this, "Không có thông tin phim", Toast.LENGTH_SHORT).show();
             finish();
@@ -107,6 +111,7 @@ public class DetailActivity2 extends AppCompatActivity {
         }
 
         movieSlug = slug; // ✅ Lưu slug
+        movieName = movieTitle;
         fetchMovieDetail(slug);
     }
 
@@ -135,15 +140,128 @@ public class DetailActivity2 extends AppCompatActivity {
         textCommentsHeader = findViewById(R.id.textCommentsHeader);
         recyclerComments = findViewById(R.id.recyclerComments);
         layoutEmptyComments = findViewById(R.id.layoutEmptyComments);
-        backToHome = findViewById(R.id.backToHome);
-
+        btnBack = findViewById(R.id.btnBack);
+        btnFav = findViewById(R.id.btnFav);
         btnSubmitRating.setOnClickListener(v -> submitOrUpdateRating());
         btnDeleteRating.setOnClickListener(v -> deleteRating());
-        backToHome.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailActivity2.this, HomeActaivity.class);
-            startActivity(intent);
+
+        //Quay ve giao dien truoc do
+        btnBack.setOnClickListener(v -> onBackPressed());
+
+        //Them phim vao collection
+        btnFav.setOnClickListener(v -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                String userId = user.getUid();
+                Log.d("USER_ID", "UID: " + userId); // In ra UID
+
+                // Gọi hàm getCollectionsByUser từ ApiService
+                ApiClient.getApiService().getCollectionsByUser(userId).enqueue(new Callback<List<CollectionFilm>>() {
+                    @Override
+                    public void onResponse(Call<List<CollectionFilm>> call, Response<List<CollectionFilm>> response) {
+                        Log.d("API_RESPONSE", "Code: " + response.code());
+                        if (response.isSuccessful()) {
+                            List<CollectionFilm> collections = response.body();
+                            if (collections != null) {
+                                showCollectionDialog(collections);
+                            } else {
+                                Toast.makeText(DetailActivity2.this, "Không lấy được bộ sưu tập", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(DetailActivity2.this, "Không lấy được bộ sưu tập", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<CollectionFilm>> call, Throwable t) {
+                        Toast.makeText(DetailActivity2.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(DetailActivity2.this, "Người dùng chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            }
         });
+        checkIfFilmIsInCollections();
     }
+
+
+    private void checkIfFilmIsInCollections() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || movieSlug == null) return;
+
+        String userId = user.getUid();
+
+        ApiClient.getApiService().isFilmInUserCollections(userId, movieSlug)
+                .enqueue(new Callback<Boolean>() {
+                    @Override
+                    public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                        if (response.isSuccessful() && Boolean.TRUE.equals(response.body())) {
+                            // ✅ Phim đã có trong bộ sưu tập → Đổi icon thành trái tim đỏ
+                            btnFav.setImageResource(R.drawable.ic_heart_fill);
+                        } else {
+                            // ❌ Phim chưa có → Để icon trái tim trắng
+                            btnFav.setImageResource(R.drawable.ic_favorite);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Boolean> call, Throwable t) {
+                        Log.e("CHECK_COLLECTION", "Lỗi: " + t.getMessage());
+                        // Gán mặc định là trái tim trắng
+                        btnFav.setImageResource(R.drawable.ic_favorite);
+                    }
+                });
+    }
+
+
+    //Hien thi Popup Modal chon bo suu tap
+    private void showCollectionDialog(List<CollectionFilm> collections) {
+        List<String> names = new ArrayList<>();
+        for (CollectionFilm cf : collections) {
+            names.add(cf.getCollection_name());
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chọn bộ sưu tập")
+                .setItems(names.toArray(new String[0]), (dialog, which) -> {
+                    CollectionFilm selected = collections.get(which);
+                    String collectionId = selected.getId();
+                    if (collectionId == null || collectionId.isEmpty()) {
+                        Toast.makeText(this, "ID bộ sưu tập không hợp lệ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(this, "Đã chọn: " + selected.getCollection_name(), Toast.LENGTH_SHORT).show();
+
+                    Movie filmToAddFav = new Movie();
+                    filmToAddFav.setName(movieTitle);
+                    filmToAddFav.setSlug(movieSlug);
+
+                    ApiClient.getApiService().addFilmToCollection(collectionId, filmToAddFav)
+                            .enqueue(new Callback<ApiResponseMessage>() {
+                                @Override
+                                public void onResponse(Call<ApiResponseMessage> call, Response<ApiResponseMessage> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Toast.makeText(DetailActivity2.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                                    } else if (response.code() == 409) {
+                                        Toast.makeText(DetailActivity2.this, "Phim đã tồn tại trong bộ sưu tập.", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(DetailActivity2.this, "Lỗi khi thêm phim: " + response.code(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ApiResponseMessage> call, Throwable t) {
+                                    Toast.makeText(DetailActivity2.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+
+
 
     private void setupRecyclerView() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -195,6 +313,7 @@ public class DetailActivity2 extends AppCompatActivity {
                 Log.e("API_ERROR", t.getMessage());
             }
         });
+        checkIfFilmIsInCollections();
     }
 
     private void setupMovieDetails(Movie movie, MovieDetailResponse response) {
