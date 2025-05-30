@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(this, HomeActaivity.class));
+                        startActivity(new Intent(this, MainNavigationActivity.class));
                         finish();
                     } else {
                         Toasty.error(this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();
@@ -186,7 +186,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Toasty.success(this, "Đăng nhập Google thành công!", Toasty.LENGTH_SHORT, true).show();
-                        startActivity(new Intent(this, HomeActaivity.class));
+                        startActivity(new Intent(this, MainNavigationActivity.class));
                         finish();
                     } else {
                         Toasty.error(this, "Lỗi Firebase: " + task.getException().getMessage(), Toasty.LENGTH_LONG, true).show();

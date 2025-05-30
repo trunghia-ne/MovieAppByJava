@@ -17,6 +17,9 @@
         tools:ignore="ExtraText"
         tools:targetApi="31">
         <activity
+            android:name=".MainNavigationActivity"
+            android:exported="false" />
+        <activity
             android:name=".SearchInputActivity"
             android:exported="false" />
         <activity
@@ -58,8 +61,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WatchActivity$PaymentResultActivity"
-
+        <activity
+            android:name=".WatchActivity$PaymentResultActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
