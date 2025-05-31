@@ -1,6 +1,9 @@
     package com.example.movieappbyjava.network;
 
+    import com.example.movieappbyjava.model.ApiResponseMessage;
+    import com.example.movieappbyjava.model.CollectionFilm;
     import com.example.movieappbyjava.model.Comment;
+    import com.example.movieappbyjava.model.Movie;
     import com.example.movieappbyjava.model.PaymentUrlResponse;
 
     import java.util.List;
@@ -17,9 +20,6 @@
     import retrofit2.http.Query;
 
     public interface ApiService {
-        @GET("hello")
-        Call<String> getHello();
-
         @POST("/api/pay")
         Call<PaymentUrlResponse> createPayment(@Query("amount") int amount, @Query("userId") String userId);
         @GET("api/reviews/{slug}")
@@ -37,4 +37,15 @@
         @DELETE("api/reviews/{reviewId}")
         Call<Void> deleteReview(@Path("reviewId") String reviewId);
 
+        @GET("api/getCollectionsByUser")
+        Call<List<CollectionFilm>> getCollectionsByUser(@Query("userId") String userId);
+
+        @POST("api/addFilmToCollection")
+        Call<ApiResponseMessage> addFilmToCollection(
+                @Query("collectionId") String collectionId,
+                @Body Movie movie
+        );
+
+        @GET("api/checkFilmInUserCollections")
+        Call<Boolean> isFilmInUserCollections(@Query("userId") String userId, @Query("slug") String slug);
     }

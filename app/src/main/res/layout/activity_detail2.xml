@@ -49,8 +49,7 @@
                     android:layout_margin="12dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_favorite"
-                    android:scaleType="centerInside"
-                    app:tint="#FFF" />
+                    android:scaleType="centerInside" />
 
                 <ImageButton
                     android:id="@+id/btnWatchTrailer"

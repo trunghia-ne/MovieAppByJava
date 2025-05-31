@@ -67,6 +67,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             if (movie.getSlug() != null && !movie.getSlug().isEmpty()) {
                 Intent intent = new Intent(v.getContext(), DetailActivity2.class);
                 intent.putExtra("movie_slug", movie.getSlug());
+                intent.putExtra("movie_name", movie.getName());
                 v.getContext().startActivity(intent);
             } else {
             }
