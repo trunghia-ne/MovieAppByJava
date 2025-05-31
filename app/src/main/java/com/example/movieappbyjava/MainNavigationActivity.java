@@ -26,6 +26,7 @@ public class MainNavigationActivity extends AppCompatActivity {
     private final ProfileFragment profileFragment = new ProfileFragment();
 
     private Fragment activeFragment = homeFragment;
+    private Fragment previousFragment = null;  // để quay lại từ Favorites
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -60,6 +61,8 @@ public class MainNavigationActivity extends AppCompatActivity {
                 switchFragment(categoryFragment);
                 return true;
             } else if (id == R.id.nav_favorite) {
+                // Ghi nhớ fragment hiện tại để khi back có thể quay lại
+                previousFragment = activeFragment;
                 switchFragment(favoritesFragment);
                 return true;
             } else if (id == R.id.nav_profile) {
@@ -78,6 +81,22 @@ public class MainNavigationActivity extends AppCompatActivity {
                     .show(target)
                     .commit();
             activeFragment = target;
+        }
+    }
+
+    // Gọi từ FavoritesFragment khi người dùng nhấn nút back
+    public void backFromFavorites() {
+        if (previousFragment != null) {
+            switchFragment(previousFragment);
+
+            // Đồng bộ icon bottom nav
+            if (previousFragment == homeFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            } else if (previousFragment == profileFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+            } else if (previousFragment == categoryFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.nav_search);
+            }
         }
     }
 }
