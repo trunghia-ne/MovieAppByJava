@@ -1,10 +1,13 @@
 package com.example.movieappbyjava.model;
+
 import com.google.firebase.Timestamp;
+
+import java.util.Date;
 
 public class CollectionFilm {
     private String id;              // document ID
     private String collection_name;
-    private Timestamp createdAt;
+    private Timestamp createdAt;         // Sửa kiểu từ Firebase Timestamp sang Date
     private String userId;
 
     public CollectionFilm() {} // Constructor rỗng bắt buộc
@@ -49,4 +52,3 @@ public class CollectionFilm {
         this.userId = userId;
     }
 }
-
