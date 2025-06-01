@@ -81,7 +81,7 @@ public class DetailActivity2 extends AppCompatActivity {
     private RecyclerView recyclerComments;
     private View layoutEmptyComments;
     private String currentRatingId = null;
-    private String movieSlug, movieName; // ✅ Đổi từ movieId thành movieSlug
+    private String movieSlug, movieName, poster_url; // ✅ Đổi từ movieId thành movieSlug
     private String movieTitle;
     private CommentAdapter commentAdapter;
     private List<Comment> commentsList = new ArrayList<>();
@@ -104,6 +104,7 @@ public class DetailActivity2 extends AppCompatActivity {
 
         String slug = getIntent().getStringExtra("movie_slug");
         String movieTitle = getIntent().getStringExtra("movie_name");
+        String poster_Url = getIntent().getStringExtra("poster_url");
         if (slug == null) {
             Toast.makeText(this, "Không có thông tin phim", Toast.LENGTH_SHORT).show();
             finish();
@@ -112,6 +113,7 @@ public class DetailActivity2 extends AppCompatActivity {
 
         movieSlug = slug; // ✅ Lưu slug
         movieName = movieTitle;
+        poster_url = poster_Url;
         fetchMovieDetail(slug);
     }
 
@@ -235,6 +237,7 @@ public class DetailActivity2 extends AppCompatActivity {
                     Movie filmToAddFav = new Movie();
                     filmToAddFav.setName(movieTitle);
                     filmToAddFav.setSlug(movieSlug);
+                    filmToAddFav.setPoster_url(poster_url);
 
                     ApiClient.getApiService().addFilmToCollection(collectionId, filmToAddFav)
                             .enqueue(new Callback<ApiResponseMessage>() {

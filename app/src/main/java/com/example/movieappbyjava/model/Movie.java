@@ -37,7 +37,7 @@ public class Movie {
     public void setSlug(String slug) {
         this.slug = slug;
     }
-
+    public void setPoster_url(String poster_url) {this.poster_url = poster_url; }
     public String getId() { return _id; }
     public String getName() { return name; }
     public String getSlug() { return slug; }

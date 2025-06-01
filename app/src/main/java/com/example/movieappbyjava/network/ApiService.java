@@ -48,4 +48,10 @@
 
         @GET("api/checkFilmInUserCollections")
         Call<Boolean> isFilmInUserCollections(@Query("userId") String userId, @Query("slug") String slug);
+
+        @POST("api/addCollection")
+        Call<ApiResponseMessage> addCollection(@Query("userId") String userId, @Body CollectionFilm collectionFilm);
+
+        @GET("api/getFilmsByCollectionId")
+        Call<List<Movie>> getFilmsByCollectionId(@Query("collectionId") String collectionId);
     }
