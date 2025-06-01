@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,7 +60,16 @@ public class FavoritesFragment extends Fragment {
         fabAdd = view.findViewById(R.id.fabAddCollection);
         rvCollections.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new CollectionAdapter(getContext(), collectionList);
+        adapter = new CollectionAdapter(getContext(), collectionList, collection -> {
+            FilmCollection fragment = FilmCollection.newInstance(collection.getId(), collection.getCollection_name());
+
+            ((AppCompatActivity) requireActivity()).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         rvCollections.setAdapter(adapter);
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
