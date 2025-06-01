@@ -68,6 +68,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 Intent intent = new Intent(v.getContext(), DetailActivity2.class);
                 intent.putExtra("movie_slug", movie.getSlug());
                 intent.putExtra("movie_name", movie.getName());
+                intent.putExtra("poster_url", movie.getPoster_url());
                 v.getContext().startActivity(intent);
             } else {
             }

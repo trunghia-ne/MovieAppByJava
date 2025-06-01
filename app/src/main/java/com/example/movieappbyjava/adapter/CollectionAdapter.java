@@ -24,12 +24,18 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
 
     private List<CollectionFilm> collections;
     private Context context;
+    private OnItemClickListener listener;
 
-    private ImageButton btnBack;
+    // Interface cho sự kiện click
+    public interface OnItemClickListener {
+        void onItemClick(CollectionFilm collection);
+    }
 
-    public CollectionAdapter(Context context, List<CollectionFilm> collections) {
+    // Constructor mới có thêm listener
+    public CollectionAdapter(Context context, List<CollectionFilm> collections, OnItemClickListener listener) {
         this.context = context;
         this.collections = collections;
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,7 +45,6 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull CollectionAdapter.ViewHolder holder, int position) {
         CollectionFilm collection = collections.get(position);
@@ -48,14 +53,20 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
 
         Timestamp createdAt = collection.getCreatedAt();
         if (createdAt != null) {
-            Date date = createdAt.toDate();  // Chuyển Timestamp sang Date
+            Date date = createdAt.toDate();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             holder.tvDesc.setText("Created At: " + sdf.format(date));
         } else {
             holder.tvDesc.setText("");
         }
-    }
 
+        // Set sự kiện click cho cả itemView
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(collection);
+            }
+        });
+    }
 
     @Override
     public int getItemCount() {
@@ -74,4 +85,5 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
         }
     }
 }
+
 
