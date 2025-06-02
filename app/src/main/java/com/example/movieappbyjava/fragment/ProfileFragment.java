@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.movieappbyjava.MyAccountActivity;
-import com.example.movieappbyjava.ProfileAdapter;
+import com.example.movieappbyjava.adapter.ProfileAdapter;
 import com.example.movieappbyjava.R;
 import com.example.movieappbyjava.model.User;
 import com.google.firebase.auth.FirebaseAuth;
