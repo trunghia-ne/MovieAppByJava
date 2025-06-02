@@ -385,7 +385,7 @@ public class DetailActivity2 extends AppCompatActivity {
 
     // PHƯƠNG THỨC LƯU PHIM ĐƯỢC CLICK VÀO LỊCH SỬ
     private void saveWatchHistory(String userId, Movie movie) {
-        // Sử dụng MovieApi thay vì ép kiểu từ UserApi
+        // Sử dụng MovieApi
         MovieApi api = ApiClient.getMovieApi(); // Cần tạo phương thức getMovieApi trong ApiClient
 
         WatchHistoryRequest request = new WatchHistoryRequest(
