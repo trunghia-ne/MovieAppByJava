@@ -40,9 +40,8 @@ import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
 import com.example.movieappbyjava.model.PaymentUrlResponse;
+import com.example.movieappbyjava.model.WatchHistory;
 import com.example.movieappbyjava.network.KKPhimApi;
-import com.example.movieappbyjava.network.MovieApi;
-import com.example.movieappbyjava.network.WatchHistoryRequest;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,6 +49,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -349,79 +349,55 @@ public class DetailActivity2 extends AppCompatActivity {
     private void setupTrailer(Movie movie) {
         btnWatchTrailer.setVisibility(View.VISIBLE);
         btnWatchTrailer.setOnClickListener(v -> {
-            Log.d("MovieApi", "Clicked watch trailer for movie: " + movie.getName());
             btnWatchTrailer.setVisibility(View.GONE);
             imagePoster.setVisibility(View.GONE);
             webTrailer.setVisibility(View.VISIBLE);
-
             String rawUrl = movie.getTrailer_url();
-            Log.d("MovieApi", "Raw trailer URL: " + rawUrl);
             if (rawUrl.contains("watch?v=")) {
                 rawUrl = rawUrl.replace("watch?v=", "embed/");
-                Log.d("MovieApi", "Modified trailer URL: " + rawUrl);
             }
-
             String html = "<html><body style='margin:0;padding:0;'>"
                     + "<iframe width='100%' height='100%' "
                     + "src='" + rawUrl + "' frameborder='0' "
                     + "allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' "
                     + "allowfullscreen></iframe>"
                     + "</body></html>";
-
-            Log.d("MovieApi", "Loading trailer HTML in WebView");
             webTrailer.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
 
             String userId = getCurrentUserId();
             if (userId == null) {
-                Log.w("MovieApi", "User not logged in, cannot save watch history");
                 Toast.makeText(DetailActivity2.this, "Bạn cần đăng nhập để lưu lịch sử xem", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            Log.d("MovieApi", "Saving watch history for userId: " + userId);
-            saveWatchHistory(userId, movie);
+            saveWatchHistory(movie, 0, 0, "TRAILER");
         });
     }
 
     // PHƯƠNG THỨC LƯU PHIM ĐƯỢC CLICK VÀO LỊCH SỬ
-    private void saveWatchHistory(String userId, Movie movie) {
-        // Sử dụng MovieApi
-        MovieApi api = ApiClient.getMovieApi(); // Cần tạo phương thức getMovieApi trong ApiClient
+    private void saveWatchHistory(Movie movie, long watchedDuration, long totalDuration, String status) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        WatchHistoryRequest request = new WatchHistoryRequest(
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        WatchHistory history = new WatchHistory(
                 userId,
                 movie.getId(),
                 movie.getName(),
-                movie.getTrailer_url()
+                movie.getPoster_url(),
+                watchedDuration,
+                totalDuration,
+                status,
+                new Date(),
+                "Android"
         );
-        Log.d("MovieApi", "WatchHistoryRequest: userId=" + request.getUserId() + ", movieId=" + request.getMovieId() + ", movieName=" + request.getMovieTitle());
 
-        Call<Void> call = api.saveWatchHistory(request);
-        Log.d("MovieApi", "Request URL: " + call.request().url());
-
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Log.i("MovieApi", "Watch history saved successfully");
-                } else {
-                    String errorBody = null;
-                    try {
-                        if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        }
-                    } catch (Exception e) {
-                        Log.e("MovieApi", "Error reading errorBody: " + e.getMessage());
-                    }
-                    Log.w("MovieApi", "Failed to save watch history. Response code: " + response.code() + ", Message: " + response.message() + ", ErrorBody: " + errorBody);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("MovieApi", "API call failed: " + t.getMessage(), t);
-            }
-        });
+        db.collection("watch_history")
+                .add(history)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("WatchHistory", "Lưu thành công: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("WatchHistory", "Lưu thất bại", e);
+                });
     }
 
     private String getCurrentUserId() {
