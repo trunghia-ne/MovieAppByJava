@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.movieappbyjava.adapter.CommentAdapter;
 import com.example.movieappbyjava.model.ApiClient;
-import com.example.movieappbyjava.model.ApiResponse;
 import com.example.movieappbyjava.model.ApiResponseMessage;
 import com.example.movieappbyjava.model.Category;
 import com.example.movieappbyjava.model.CollectionFilm;
@@ -42,23 +40,17 @@ import com.example.movieappbyjava.model.Episode;
 import com.example.movieappbyjava.model.Movie;
 import com.example.movieappbyjava.model.MovieDetailResponse;
 import com.example.movieappbyjava.model.PaymentUrlResponse;
-import com.example.movieappbyjava.network.ApiService;
 import com.example.movieappbyjava.network.KKPhimApi;
+import com.example.movieappbyjava.network.MovieApi;
+import com.example.movieappbyjava.network.WatchHistoryRequest;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -264,8 +256,6 @@ public class DetailActivity2 extends AppCompatActivity {
     }
 
 
-
-
     private void setupRecyclerView() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = currentUser != null ? currentUser.getUid() : "";
@@ -359,13 +349,16 @@ public class DetailActivity2 extends AppCompatActivity {
     private void setupTrailer(Movie movie) {
         btnWatchTrailer.setVisibility(View.VISIBLE);
         btnWatchTrailer.setOnClickListener(v -> {
+            Log.d("MovieApi", "Clicked watch trailer for movie: " + movie.getName());
             btnWatchTrailer.setVisibility(View.GONE);
             imagePoster.setVisibility(View.GONE);
             webTrailer.setVisibility(View.VISIBLE);
 
             String rawUrl = movie.getTrailer_url();
+            Log.d("MovieApi", "Raw trailer URL: " + rawUrl);
             if (rawUrl.contains("watch?v=")) {
                 rawUrl = rawUrl.replace("watch?v=", "embed/");
+                Log.d("MovieApi", "Modified trailer URL: " + rawUrl);
             }
 
             String html = "<html><body style='margin:0;padding:0;'>"
@@ -375,8 +368,67 @@ public class DetailActivity2 extends AppCompatActivity {
                     + "allowfullscreen></iframe>"
                     + "</body></html>";
 
+            Log.d("MovieApi", "Loading trailer HTML in WebView");
             webTrailer.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+
+            String userId = getCurrentUserId();
+            if (userId == null) {
+                Log.w("MovieApi", "User not logged in, cannot save watch history");
+                Toast.makeText(DetailActivity2.this, "Bạn cần đăng nhập để lưu lịch sử xem", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Log.d("MovieApi", "Saving watch history for userId: " + userId);
+            saveWatchHistory(userId, movie);
         });
+    }
+
+    // PHƯƠNG THỨC LƯU PHIM ĐƯỢC CLICK VÀO LỊCH SỬ
+    private void saveWatchHistory(String userId, Movie movie) {
+        // Sử dụng MovieApi
+        MovieApi api = ApiClient.getMovieApi(); // Cần tạo phương thức getMovieApi trong ApiClient
+
+        WatchHistoryRequest request = new WatchHistoryRequest(
+                userId,
+                movie.getId(),
+                movie.getName(),
+                movie.getTrailer_url()
+        );
+        Log.d("MovieApi", "WatchHistoryRequest: userId=" + request.getUserId() + ", movieId=" + request.getMovieId() + ", movieName=" + request.getMovieTitle());
+
+        Call<Void> call = api.saveWatchHistory(request);
+        Log.d("MovieApi", "Request URL: " + call.request().url());
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.i("MovieApi", "Watch history saved successfully");
+                } else {
+                    String errorBody = null;
+                    try {
+                        if (response.errorBody() != null) {
+                            errorBody = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e("MovieApi", "Error reading errorBody: " + e.getMessage());
+                    }
+                    Log.w("MovieApi", "Failed to save watch history. Response code: " + response.code() + ", Message: " + response.message() + ", ErrorBody: " + errorBody);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("MovieApi", "API call failed: " + t.getMessage(), t);
+            }
+        });
+    }
+
+    private String getCurrentUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String userId = user != null ? user.getUid() : null;
+        Log.d("MovieApi", "Current userId: " + (userId != null ? userId : "null"));
+        return userId;
     }
 
     private void setupEpisodes(MovieDetailResponse response) {
@@ -401,7 +453,6 @@ public class DetailActivity2 extends AppCompatActivity {
                 lp.setMargins(12, 10, 12, 10);
                 epView.setLayoutParams(lp);
 
-                // 👉 Click để mở WatchActivity
                 epView.setOnClickListener(v -> {
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (currentUser == null) {
@@ -444,6 +495,7 @@ public class DetailActivity2 extends AppCompatActivity {
         }
 
     }
+
     private void showPaymentDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(DetailActivity2.this)
                 .setTitle("Bạn cần mua gói xem phim")

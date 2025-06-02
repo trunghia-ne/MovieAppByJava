@@ -1,6 +1,7 @@
 package com.example.movieappbyjava.model;
 
 import com.example.movieappbyjava.network.ApiService;
+import com.example.movieappbyjava.network.MovieApi;
 import com.example.movieappbyjava.network.UserApi;
 
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,9 @@ public class ApiClient {
     private static ApiService apiService = retrofit.create(ApiService.class);
     private static UserApi userApi = retrofit.create(UserApi.class);
 
+    private static MovieApi movieApi = retrofit.create(MovieApi.class);
+
+
     public static ApiService getApiService() {
         return apiService;
     }
@@ -34,4 +38,9 @@ public class ApiClient {
     public static UserApi getUserApi() {
         return userApi;
     }
+
+    public static MovieApi getMovieApi() {
+        return movieApi;
+    }
+
 }
