@@ -17,14 +17,9 @@ import androidx.fragment.app.Fragment;
 import com.example.movieappbyjava.MyAccountActivity;
 import com.example.movieappbyjava.ProfileAdapter;
 import com.example.movieappbyjava.R;
-import com.example.movieappbyjava.model.ApiClient;
 import com.example.movieappbyjava.model.User;
-import com.example.movieappbyjava.network.UserApi;
 import com.google.firebase.auth.FirebaseAuth;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
     private TextView tvUserName;
@@ -37,10 +32,8 @@ public class ProfileFragment extends Fragment {
             R.drawable.ic_logout
     };
 
-    private UserApi userApi;
 
     public ProfileFragment() {
-        // Required empty public constructor
     }
 
     @Nullable
@@ -74,38 +67,32 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserInfo() {
-        userApi = ApiClient.getUserApi();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Log.d("UserApi", "Fetching user data for userId: " + userId);
-
-        Call<User> call = userApi.getUserById(userId);
-        Log.d("UserApi", "Request URL: " + call.request().url()); // Di chuyển log URL vào đây
-
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                Log.d("UserApi", "Response received, code: " + response.code());
-                if (response.isSuccessful() && response.body() != null) {
-                    User user = response.body();
-                    Log.i("UserApi", "User data retrieved: " + user.getUsername() + ", Phone: " + user.getPhone());
-                    tvUserName.setText(user.getUsername());
-                    tvPhone.setText(user.getPhone());
-                } else {
-                    Log.w("UserApi", "Failed to retrieve user data. Response code: " + response.code() + ", Message: " + response.message());
+        db.collection("users").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User user = documentSnapshot.toObject(User.class);
+                        if (user != null) {
+                            tvUserName.setText(user.getUsername());
+                            tvPhone.setText(user.getPhone());
+                            Log.d("UserFirestore", "User loaded: " + user.getUsername());
+                        }
+                    } else {
+                        tvUserName.setText("Tên người dùng");
+                        tvPhone.setText("Không rõ");
+                        Toast.makeText(requireContext(), "Không tìm thấy dữ liệu người dùng!", Toast.LENGTH_SHORT).show();
+                        Log.w("UserFirestore", "Document does not exist.");
+                    }
+                })
+                .addOnFailureListener(e -> {
                     tvUserName.setText("Tên người dùng");
                     tvPhone.setText("Không rõ");
-                    Toast.makeText(requireContext(), "Không tìm thấy dữ liệu người dùng!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                Log.e("UserApi", "API call failed: " + t.getMessage(), t);
-                tvUserName.setText("Tên người dùng");
-                tvPhone.setText("Không rõ");
-                Toast.makeText(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(requireContext(), "Lỗi kết nối đến Firestore!", Toast.LENGTH_SHORT).show();
+                    Log.e("UserFirestore", "Lỗi khi lấy dữ liệu: ", e);
+                });
     }
+
 }
