@@ -9,9 +9,12 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface UserApi {
-    @GET("/api/user/{id}")
+    @GET("/api/users/{id}")
     Call<User> getUserById(@Path("id") String id);
 
-    @PUT("/api/user/{id}")
+    @PUT("/api/users/{id}")
     Call<Void> updateUser(@Path("id") String id, @Body User user);
+
+
+
 }

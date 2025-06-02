@@ -3,13 +3,17 @@ package com.example.movieappbyjava.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.example.movieappbyjava.MyAccountActivity;
 import com.example.movieappbyjava.ProfileAdapter;
 import com.example.movieappbyjava.R;
@@ -26,10 +30,9 @@ public class ProfileFragment extends Fragment {
     private TextView tvUserName;
     private TextView tvPhone;
 
-    private final String[] menuItems = {"My Account", "Your Favorites", "History Watched", "Logout"};
+    private final String[] menuItems = {"My Account", "History Watched", "Logout"};
     private final int[] icons = {
             R.drawable.ic_user,
-            R.drawable.ic_favorite,
             R.drawable.ic_movie,
             R.drawable.ic_logout
     };
@@ -74,25 +77,34 @@ public class ProfileFragment extends Fragment {
         userApi = ApiClient.getUserApi();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        Log.d("UserApi", "Fetching user data for userId: " + userId);
+
         Call<User> call = userApi.getUserById(userId);
-        call.enqueue(new Callback<>() {
+        Log.d("UserApi", "Request URL: " + call.request().url()); // Di chuyển log URL vào đây
+
+        call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                Log.d("UserApi", "Response received, code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
+                    Log.i("UserApi", "User data retrieved: " + user.getUsername() + ", Phone: " + user.getPhone());
                     tvUserName.setText(user.getUsername());
                     tvPhone.setText(user.getPhone());
                 } else {
+                    Log.w("UserApi", "Failed to retrieve user data. Response code: " + response.code() + ", Message: " + response.message());
                     tvUserName.setText("Tên người dùng");
                     tvPhone.setText("Không rõ");
+                    Toast.makeText(requireContext(), "Không tìm thấy dữ liệu người dùng!", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                Log.e("PROFILE_FRAGMENT", "Lỗi tải thông tin: " + t.getMessage(), t);
+                Log.e("UserApi", "API call failed: " + t.getMessage(), t);
                 tvUserName.setText("Tên người dùng");
                 tvPhone.setText("Không rõ");
+                Toast.makeText(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
