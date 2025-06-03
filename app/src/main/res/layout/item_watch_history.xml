@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="4dp"
+    android:background="@android:color/transparent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:background="@color/dark_gray">
+
+        <ImageView
+            android:id="@+id/imgPoster"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:layout_alignParentStart="true" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/imgPoster"
+            android:layout_marginStart="12dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@id/imgPoster">
+
+            <TextView
+                android:id="@+id/tvMovieName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên phim"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvWatchedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã xem: 45 phút / 90 phút"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trạng thái: Đang xem"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvWatchedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xem lúc: 02/06/2025 14:30"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thiết bị: Android"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
