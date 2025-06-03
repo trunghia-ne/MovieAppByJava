@@ -55,6 +55,13 @@ public class ProfileFragment extends Fragment {
                 case "My Account":
                     startActivity(new Intent(requireContext(), MyAccountActivity.class));
                     break;
+                case "History Watched":
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, new WatchHistoryFragment()) // R.id.fragment_container là layout chứa fragment
+                            .addToBackStack(null)
+                            .commit();
+                    break;
                 case "Logout":
                     FirebaseAuth.getInstance().signOut();
                     requireActivity().finish(); // hoặc chuyển sang LoginActivity nếu cần
