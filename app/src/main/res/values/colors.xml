@@ -9,4 +9,7 @@
     <color name="gray">#333</color>
     <color name="white_70_alpha">#B3FFFFFF</color>
     <color name="back_toolbar">#272A38</color>
+    <color name="dark_gray">#1E1E1E</color>
+    <color name="light_gray">#CCCCCC</color>
+
 </resources>

@@ -4,4 +4,9 @@
     <item android:color="@color/orange" android:state_checked="true" />
     <!-- Trạng thái mặc định -->
     <item android:color="@color/gray" />
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="dark_gray">#1E1E1E</color>
+    <color name="light_gray">#CCCCCC</color>
+
 </selector>
