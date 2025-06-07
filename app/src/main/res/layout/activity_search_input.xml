@@ -41,7 +41,7 @@
             android:theme="@style/CustomSearchViewStyle"
             app:iconifiedByDefault="false"
             app:queryBackground="@android:color/transparent"
-            app:queryHint="Tìm kiếm phim..."
+            app:queryHint="Search film..."
             app:searchIcon="@drawable/search" />
     </LinearLayout>
 

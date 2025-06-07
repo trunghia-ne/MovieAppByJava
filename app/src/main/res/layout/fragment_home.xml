@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/main_color"
     android:fitsSystemWindows="true"
-    tools:context=".HomeActaivity">
+    tools:context=".fragment.HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout_home"
