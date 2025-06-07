@@ -1,15 +1,25 @@
 package com.example.movieappbyjava;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.movieappbyjava.fragment.CategoryFragment;
 import com.example.movieappbyjava.fragment.FavoritesFragment;
 import com.example.movieappbyjava.fragment.HomeFragment;
@@ -27,6 +37,7 @@ public class MainNavigationActivity extends AppCompatActivity {
 
     private Fragment activeFragment = homeFragment;
     private Fragment previousFragment = null;  // để quay lại từ Favorites
+    String avatarUrl = "https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg";
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -35,6 +46,7 @@ public class MainNavigationActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main_navigation);
 
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -42,6 +54,21 @@ public class MainNavigationActivity extends AppCompatActivity {
         });
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        Glide.with(this)
+                .asBitmap()
+                .load(avatarUrl)
+                .override(dpToPx(24), dpToPx(24)) // Resize ảnh về 24dp
+                .circleCrop()
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Drawable circularDrawable = new BitmapDrawable(getResources(), resource);
+                        bottomNavigationView.getMenu().findItem(R.id.nav_profile).setIcon(circularDrawable);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
 
         // Thêm tất cả Fragment chỉ 1 lần duy nhất
         getSupportFragmentManager().beginTransaction()
@@ -98,5 +125,16 @@ public class MainNavigationActivity extends AppCompatActivity {
                 bottomNavigationView.setSelectedItemId(R.id.nav_search);
             }
         }
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
+    public void navigateToFavorites() {
+        previousFragment = activeFragment; // nếu cần quay lại từ Favorites
+        switchFragment(favoritesFragment);
+        bottomNavigationView.setSelectedItemId(R.id.nav_favorite); // đồng bộ nút được chọn
     }
 }

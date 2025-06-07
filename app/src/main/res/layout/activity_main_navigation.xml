@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="66dp"
             app:menu="@menu/bottom_nav_menu"
-            app:labelVisibilityMode="labeled"/>
+            app:labelVisibilityMode="labeled"
+            app:itemIconTint="@null" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

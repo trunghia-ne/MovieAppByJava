@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.movieappbyjava.MainNavigationActivity;
 import com.example.movieappbyjava.MyAccountActivity;
 import com.example.movieappbyjava.adapter.ProfileAdapter;
 import com.example.movieappbyjava.R;
@@ -25,9 +26,10 @@ public class ProfileFragment extends Fragment {
     private TextView tvUserName;
     private TextView tvPhone;
 
-    private final String[] menuItems = {"My Account", "History Watched", "Logout"};
+    private final String[] menuItems = {"My Account", "Collections", "History Watched", "Logout"};
     private final int[] icons = {
             R.drawable.ic_user,
+            R.drawable.ic_favorite,
             R.drawable.ic_movie,
             R.drawable.ic_logout
     };
@@ -57,7 +59,12 @@ public class ProfileFragment extends Fragment {
                     break;
                 case "Logout":
                     FirebaseAuth.getInstance().signOut();
-                    requireActivity().finish(); // hoặc chuyển sang LoginActivity nếu cần
+                    requireActivity().finish();
+                    break;
+                case "Collections":
+                    if (getActivity() instanceof MainNavigationActivity) {
+                        ((MainNavigationActivity) getActivity()).navigateToFavorites();
+                    }
                     break;
             }
         });
