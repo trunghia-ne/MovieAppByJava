@@ -121,15 +121,32 @@
                 android:layout_marginTop="8dp" />
 
             <!-- Login Button -->
-            <Button
-                android:id="@+id/loginBtn"
+            <FrameLayout
+                android:id="@+id/loginFrame"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="Login"
-                android:textColor="@android:color/white"
-                android:background="@drawable/orange_button_background"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                android:background="@drawable/orange_button_background">
+
+                <TextView
+                    android:id="@+id/loginBtnText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Login"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/LoginProgress"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    style="?android:attr/progressBarStyleSmall" />
+            </FrameLayout>
+
 
             <!-- Register Text -->
             <TextView

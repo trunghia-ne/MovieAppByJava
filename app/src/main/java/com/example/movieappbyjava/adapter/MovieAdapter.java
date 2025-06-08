@@ -119,4 +119,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             title = itemView.findViewById(R.id.title);
         }
     }
+
+    public void appendMovies(List<Movie> newMovies) {
+        int oldSize = movies.size();
+        movies.addAll(newMovies);
+        notifyItemRangeInserted(oldSize, newMovies.size());
+    }
 }

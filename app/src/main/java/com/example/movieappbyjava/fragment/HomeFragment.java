@@ -129,10 +129,10 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        setupMovieSection(recyclerSingleMovies, singleMovieList, singleMovieAdapter, api.getSingleMovies());
-        setupMovieSection(recyclerSeriesMovies, seriesMoviesList, seriesMovieAdapter, api.getSeriasMovies());
-        setupMovieSection(recyclerAnimeMovies, animeMoviesList, animeMovieAdapter, api.getAnimeMovies());
-        setupMovieSection(recyclerTvShowMovies, tvShowMoviesList, tvShowMovieAdapter, api.getTvShowMovies());
+        setupMovieSection(recyclerSingleMovies, singleMovieList, singleMovieAdapter, api.getSingleMovies(1));
+        setupMovieSection(recyclerSeriesMovies, seriesMoviesList, seriesMovieAdapter, api.getSeriasMovies(1));
+        setupMovieSection(recyclerAnimeMovies, animeMoviesList, animeMovieAdapter, api.getAnimeMovies(1));
+        setupMovieSection(recyclerTvShowMovies, tvShowMoviesList, tvShowMovieAdapter, api.getTvShowMovies(1));
     }
 
     private void setupMovieSection(RecyclerView rv, List<Movie> list, MovieAdapter adapter, Call<ApiResponsePhim> apiCall) {
