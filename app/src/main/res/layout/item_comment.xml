@@ -1,96 +1,151 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:background="@drawable/bg_comment_item"
-    android:layout_marginBottom="8dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="2dp">
 
-    <!-- Avatar -->
-    <ImageView
-        android:id="@+id/imageAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="12dp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/bg_comment_item"
-        android:contentDescription="User Avatar" />
-
-    <!-- Comment Content -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="8dp">
 
-        <!-- Username and Level -->
+        <!-- Dòng chứa avatar, thông tin người dùng, nút reply và nút xóa -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/textUser"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#4A9EFF"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:text="Username" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lv.25"
-                android:textColor="#FFD700"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:layout_marginStart="8dp"
-                android:background="#333"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="2dp"
+            <!-- Avatar -->
+            <ImageView
+                android:id="@+id/imageAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_user_placeholder"
+                android:contentDescription="Avatar"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Thông tin người dùng và bình luận -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Tên người dùng -->
+                <TextView
+                    android:id="@+id/textUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333" />
+
+                <!-- Nội dung bình luận -->
+                <TextView
+                    android:id="@+id/textComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textColor="#666"
+                    android:layout_marginTop="4dp" />
+
+                <!-- Thời gian -->
+                <TextView
+                    android:id="@+id/textTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_marginTop="2dp" />
+
+                <!-- Rating -->
+                <RatingBar
+                    android:id="@+id/ratingUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="0.1"
+                    android:isIndicator="true"
+                    android:rating="0"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Nút phản hồi -->
+            <ImageView
+                android:id="@+id/btnReply"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/ic_reply"
+                android:padding="4dp"
+                android:contentDescription="Reply"
+                android:layout_marginStart="8dp" />
+
+            <!-- Nút xóa -->
+            <ImageView
+                android:id="@+id/btnDelete"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/ic_delete"
+                android:padding="4dp"
+                android:contentDescription="Delete"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <!-- Rating Stars -->
-        <RatingBar
-            android:id="@+id/ratingUser"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="1.0"
-            android:isIndicator="true"
-            android:rating="3"
-            android:scaleX="0.7"
-            android:scaleY="0.7"
-            android:layout_marginTop="2dp"
-            android:layout_marginStart="-8dp"
-            style="?android:attr/ratingBarStyleSmall" />
-
-        <!-- Comment Text -->
-        <TextView
-            android:id="@+id/textComment"
+        <!-- Khu vực phản hồi -->
+        <LinearLayout
+            android:id="@+id/layoutReplies"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"
-            android:lineSpacingExtra="2dp"
-            android:text="This is a sample comment text that shows how the comment will look in the app." />
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingTop="8dp"
+            android:visibility="gone" />
 
-        <!-- Time -->
-        <TextView
-            android:id="@+id/textTime"
-            android:layout_width="wrap_content"
+        <!-- Ô nhập phản hồi -->
+        <LinearLayout
+            android:id="@+id/layoutReplyInput"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#888888"
-            android:textSize="11sp"
-            android:layout_marginTop="4dp"
-            android:text="Trả lời 2 phút trước" />
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:visibility="gone">
 
+            <EditText
+                android:id="@+id/editReply"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Nhập phản hồi..."
+                android:padding="8dp"
+                android:maxLines="2"
+                android:background="@drawable/edittext_background"
+                android:textColor="#333"
+                android:textSize="14sp" />
+            <Button
+                android:id="@+id/btnSubmitReply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gửi"
+                android:padding="8dp"
+                android:background="@drawable/rounded_yellow_button"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBarReplyLoading"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="gone"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>
