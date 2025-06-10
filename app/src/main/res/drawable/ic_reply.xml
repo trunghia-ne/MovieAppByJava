@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Vẽ bong bóng thoại -->
+    <path
+        android:fillColor="#000"
+        android:pathData="M4,12c0,4 4,8 8,8s8-4 8-8 -4-8 -8-8 -8,4 -8,8z M4,12l-2,2l2,2h2v-4H4z" />
+
+    <!-- Vẽ ba chấm bằng path -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,12m-1.5,0a1.5,1.5 0,1 1,3,0a1.5,1.5 0,1 1,-3,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,12m-1.5,0a1.5,1.5 0,1 1,3,0a1.5,1.5 0,1 1,-3,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,12m-1.5,0a1.5,1.5 0,1 1,3,0a1.5,1.5 0,1 1,-3,0" />
+</vector>

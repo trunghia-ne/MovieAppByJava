@@ -15,4 +15,16 @@
     <style name="ToolbarTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">26sp</item> <item name="android:textColor">@android:color/white</item>
     </style>
+    <style name="RatingBarSmall" parent="android:Widget.RatingBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:numStars">5</item>
+        <item name="android:stepSize">0.5</item>
+        <item name="android:isIndicator">true</item>
+        <item name="android:progressTint">#FF9800</item> <!-- Màu sao, có thể thay đổi -->
+        <item name="android:secondaryProgressTint">#FF9800</item>
+        <item name="android:backgroundTint">#CCCCCC</item>
+        <item name="android:minHeight">16dp</item> <!-- Kích thước nhỏ hơn -->
+        <item name="android:maxHeight">16dp</item>
+    </style>
 </resources>
