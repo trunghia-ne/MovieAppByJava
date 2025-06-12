@@ -6,12 +6,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.movieappbyjava.R;
 
 public class CategoryFragment extends Fragment {
-
+    private ImageView btnBack;
     public CategoryFragment() {
 
     }
@@ -42,16 +43,23 @@ public class CategoryFragment extends Fragment {
         cardPhimAnime.setOnClickListener(v -> openCategory("anime"));
         cardTvShows.setOnClickListener(v -> openCategory("tvshows"));
 
+        btnBack = view.findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
+
         return view;
     }
 
     private void openCategory(String categoryKey) {
-        Fragment fragment = CateMovieFragment.newInstance(categoryKey);
-        getParentFragmentManager()
+        CateMovieFragment fragment = CateMovieFragment.newInstance(categoryKey);
+
+        // Ẩn layout chính, hiện container nested
+        requireView().findViewById(R.id.category_layout).setVisibility(View.GONE);
+        requireView().findViewById(R.id.nestedFragmentContainer).setVisibility(View.VISIBLE);
+
+        getChildFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
+                .replace(R.id.nestedFragmentContainer, fragment)
                 .addToBackStack(null)
                 .commit();
     }
-
 }

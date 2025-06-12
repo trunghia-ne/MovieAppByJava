@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +39,8 @@ public class HomeFragment extends Fragment {
     private final List<Movie> seriesMoviesList = new ArrayList<>();
     private final List<Movie> animeMoviesList = new ArrayList<>();
     private final List<Movie> tvShowMoviesList = new ArrayList<>();
+
+    private TextView tabAll, tabDrama, tabRomance, tabHorror ,tabComedy;
 
     private KKPhimApi api;
 
@@ -95,6 +98,18 @@ public class HomeFragment extends Fragment {
         seriesMovieAdapter = new MovieAdapter(seriesMoviesList);
         animeMovieAdapter = new MovieAdapter(animeMoviesList);
         tvShowMovieAdapter = new MovieAdapter(tvShowMoviesList);
+
+        tabAll = view.findViewById(R.id.tab_all);
+        tabDrama = view.findViewById(R.id.tab_drama);
+        tabRomance = view.findViewById(R.id.tab_romance);
+        tabHorror = view.findViewById(R.id.tab_horror);
+        tabComedy = view.findViewById(R.id.tab_comedy);
+
+        tabDrama.setOnClickListener(v -> openGenreFragment("drama"));
+        tabRomance.setOnClickListener(v -> openGenreFragment("romance"));
+        tabComedy.setOnClickListener(v -> openGenreFragment("comedy"));
+        tabHorror.setOnClickListener(v -> openGenreFragment("horror"));
+
 
         recyclerViewLatestMovies.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerSingleMovies.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -155,5 +170,14 @@ public class HomeFragment extends Fragment {
                 Log.e("API_MovieSection", "Lỗi API section: " + t.getMessage(), t);
             }
         });
+    }
+
+
+    private void openGenreFragment(String genre) {
+        Fragment fragment = SearchGenreFragment.newInstance(genre);
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
