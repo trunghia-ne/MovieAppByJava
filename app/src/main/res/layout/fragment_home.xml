@@ -118,6 +118,39 @@
                         android:padding="8dp"
                         android:text="Drama"
                         android:textColor="#FFD700" />
+
+                    <TextView
+                        android:id="@+id/tab_romance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Romance"
+                        android:textColor="#FFD700" />
+
+                    <TextView
+                        android:id="@+id/tab_horror"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Horror"
+                        android:textColor="#FFD700" />
+
+                    <TextView
+                        android:id="@+id/tab_comedy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Comedy"
+                        android:textColor="#FFD700" />
                 </LinearLayout>
             </HorizontalScrollView>
 

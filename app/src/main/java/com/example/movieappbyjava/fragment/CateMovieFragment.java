@@ -75,7 +75,26 @@ public class CateMovieFragment extends Fragment {
         btnBack = view.findViewById(R.id.btn_back);
         progressBar = view.findViewById(R.id.progressBar);
 
-        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
+        btnBack.setOnClickListener(v -> {
+            // remove chính fragment này khỏi CategoryFragment
+            if (getParentFragment() != null) {
+                getParentFragment().getChildFragmentManager()
+                        .beginTransaction()
+                        .remove(CateMovieFragment.this)
+                        .commit();
+            }
+
+            // hiện lại layout chính của category
+            if (getParentFragment().getView() != null) {
+                View parentView = getParentFragment().getView();
+                View layout = parentView.findViewById(R.id.category_layout);
+                View nested = parentView.findViewById(R.id.nestedFragmentContainer);
+
+                layout.setVisibility(View.VISIBLE);
+                nested.setVisibility(View.GONE);
+            }
+        });
+
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
