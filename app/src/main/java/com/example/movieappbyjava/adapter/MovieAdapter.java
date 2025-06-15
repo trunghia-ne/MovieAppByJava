@@ -29,6 +29,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         this.movies = movies;
     }
 
+    public interface OnMovieLongClickListener {
+        void onLongClick(Movie movie);
+    }
+
+    private OnMovieLongClickListener longClickListener;
+
+    public void setOnMovieLongClickListener(OnMovieLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+
+
     @NonNull
     @Override
     public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -72,6 +83,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 v.getContext().startActivity(intent);
             } else {
             }
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onLongClick(movie);
+            }
+            return true;
         });
     }
 

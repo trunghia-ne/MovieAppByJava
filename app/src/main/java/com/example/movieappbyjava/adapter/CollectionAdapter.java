@@ -29,7 +29,9 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
     // Interface cho sự kiện click
     public interface OnItemClickListener {
         void onItemClick(CollectionFilm collection);
+        void onItemLongClick(CollectionFilm collection);
     }
+
 
     // Constructor mới có thêm listener
     public CollectionAdapter(Context context, List<CollectionFilm> collections, OnItemClickListener listener) {
@@ -65,6 +67,14 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Vi
             if (listener != null) {
                 listener.onItemClick(collection);
             }
+        });
+
+        // Nhấn giữ để xoá
+        holder.itemView.setOnLongClickListener(v -> {
+            if (listener != null) {
+                listener.onItemLongClick(collection);
+            }
+            return true; // báo là đã xử lý sự kiện long click
         });
     }
 
