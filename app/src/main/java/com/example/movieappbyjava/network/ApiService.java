@@ -63,4 +63,13 @@ public interface ApiService {
 
     @GET("api/getFilmsByCollectionId")
     Call<List<Movie>> getFilmsByCollectionId(@Query("collectionId") String collectionId);
+
+    @DELETE("api/deleteCollection")
+    Call<ApiResponseMessage> deleteCollection(@Query("collectionId") String collectionId);
+
+    @DELETE("api/deleteFilmFromCollection")
+    Call<ApiResponseMessage> deleteFilmFromCollection(
+            @Query("collectionId") String collectionId,
+            @Query("slug") String slug
+    );
 }
