@@ -1,9 +1,13 @@
 package com.example.movieappbyjava.adapter;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,6 +47,7 @@ import retrofit2.Response;
 import android.util.Log;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
+    private static final int MAX_REPLY_LENGTH = 200; // Giới hạn độ dài phản hồi
     private List<Comment> comments;
     private final String currentUserId;
     private final String movieSlug;
@@ -59,10 +64,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageAvatar;
-        TextView textUser, textComment, textTime;
+        TextView textUser, textComment, textTime, textCharCount;
         RatingBar ratingUser;
         ImageView btnReply;
-        ImageView btnDelete;
         LinearLayout layoutReplies;
         LinearLayout layoutReplyInput;
         EditText editReply;
@@ -75,9 +79,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             textUser = itemView.findViewById(R.id.textUser);
             textComment = itemView.findViewById(R.id.textComment);
             textTime = itemView.findViewById(R.id.textTime);
+            textCharCount = itemView.findViewById(R.id.textCharCount);
             ratingUser = itemView.findViewById(R.id.ratingUser);
             btnReply = itemView.findViewById(R.id.btnReply);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
             layoutReplies = itemView.findViewById(R.id.layoutReplies);
             layoutReplyInput = itemView.findViewById(R.id.layoutReplyInput);
             editReply = itemView.findViewById(R.id.editReply);
@@ -99,11 +103,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         if (comment.getUserId() != null && comment.getUserId().equals(currentUserId)) {
             holder.textUser.setText(comment.getUsername() + " (Bạn)");
             holder.textUser.setTextColor(Color.parseColor("#2196F3"));
-            holder.btnDelete.setVisibility(View.VISIBLE);
         } else {
             holder.textUser.setText(comment.getUsername() != null ? comment.getUsername() : "Người dùng ẩn danh");
             holder.textUser.setTextColor(Color.parseColor("#333333"));
-            holder.btnDelete.setVisibility(View.GONE);
         }
 
         holder.textComment.setText(comment.getComment() != null ? comment.getComment() : "");
@@ -133,11 +135,38 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 Toast.makeText(holder.itemView.getContext(), "Vui lòng đăng nhập để phản hồi", Toast.LENGTH_SHORT).show();
             });
         } else {
+            // Thêm TextWatcher để theo dõi và kiểm tra độ dài phản hồi
+            holder.editReply.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String replyText = s.toString().trim();
+                    holder.btnSubmitReply.setEnabled(!replyText.isEmpty() && replyText.length() <= MAX_REPLY_LENGTH);
+                    holder.textCharCount.setText(replyText.length() + "/" + MAX_REPLY_LENGTH);
+                    if (replyText.length() > MAX_REPLY_LENGTH) {
+                        holder.textCharCount.setTextColor(Color.RED);
+                        Toast.makeText(holder.itemView.getContext(),
+                                "Phản hồi vượt quá " + MAX_REPLY_LENGTH + " ký tự",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        holder.textCharCount.setTextColor(Color.parseColor("#666666"));
+                    }
+                }
+            });
+
             holder.btnReply.setOnClickListener(v -> {
                 if (expandedComments.contains(comment.getId())) {
                     expandedComments.remove(comment.getId());
                     holder.layoutReplies.setVisibility(View.GONE);
                     holder.layoutReplyInput.setVisibility(View.GONE);
+                    holder.editReply.setText(""); // Xóa nội dung khi đóng
+                    holder.textCharCount.setText("0/" + MAX_REPLY_LENGTH);
+                    holder.textCharCount.setTextColor(Color.parseColor("#666666"));
                 } else {
                     expandedComments.add(comment.getId());
                     holder.layoutReplies.setVisibility(View.VISIBLE);
@@ -149,53 +178,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         holder.btnSubmitReply.setOnClickListener(v -> {
             String replyText = holder.editReply.getText().toString().trim();
-            if (!replyText.isEmpty()) {
-                submitReply(comment.getId(), replyText, holder);
-            } else {
+            if (replyText.isEmpty()) {
                 Toast.makeText(holder.itemView.getContext(), "Vui lòng nhập nội dung phản hồi", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        holder.btnDelete.setOnClickListener(v -> {
-            int currentPosition = holder.getAdapterPosition();
-            if (currentPosition == RecyclerView.NO_POSITION) {
                 return;
             }
-            Comment currentComment = comments.get(currentPosition);
-            new AlertDialog.Builder(holder.itemView.getContext())
-                    .setTitle("Xóa bình luận")
-                    .setMessage("Bạn có chắc muốn xóa bình luận này?")
-                    .setPositiveButton("Xóa", (dialog, which) -> {
-                        ApiClient.getApiService().deleteReview(currentComment.getId()).enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                if (response.isSuccessful()) {
-                                    comments.remove(currentPosition);
-                                    notifyItemRemoved(currentPosition);
-                                    notifyItemRangeChanged(currentPosition, comments.size());
-                                    Toast.makeText(holder.itemView.getContext(), "Đã xóa bình luận", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.e("DELETE_COMMENT", "Error code: " + response.code());
-                                    try {
-                                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
-                                        Log.e("DELETE_COMMENT", "Error body: " + errorBody);
-                                    } catch (IOException e) {
-                                        Log.e("DELETE_COMMENT", "Error reading error body", e);
-                                    }
-                                    String errorMessage = response.code() == 400 ? "Dữ liệu không hợp lệ" : "Lỗi server, vui lòng thử lại";
-                                    Toast.makeText(holder.itemView.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                Log.e("DELETE_COMMENT", "Network failure: " + t.getMessage(), t);
-                                Toast.makeText(holder.itemView.getContext(), "Lỗi kết nối server, vui lòng thử lại", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    })
-                    .setNegativeButton("Hủy", null)
-                    .show();
+            if (replyText.length() > MAX_REPLY_LENGTH) {
+                Toast.makeText(holder.itemView.getContext(),
+                        "Phản hồi không được vượt quá " + MAX_REPLY_LENGTH + " ký tự",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+            submitReply(comment.getId(), replyText, holder);
         });
     }
 
@@ -228,7 +221,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             return;
         }
 
-        // Kiểm tra cache
         if (repliesCache.containsKey(commentId)) {
             displayReplies(repliesCache.get(commentId), container, commentId);
             return;
@@ -281,19 +273,23 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             noRepliesText.setPadding(16, 8, 16, 8);
             container.addView(noRepliesText);
         } else {
+            container.removeAllViews(); // Xóa tất cả view cũ trước khi thêm mới
             for (Comment reply : replies) {
+                // Inflate layout cho phản hồi
                 View replyView = LayoutInflater.from(container.getContext())
                         .inflate(R.layout.item_reply, container, false);
                 TextView textUser = replyView.findViewById(R.id.textUser);
-                TextView textComment = replyView.findViewById(R.id.textComment);
+                TextView textComment = replyView.findViewById(R.id.textComment); // Sử dụng textComment
                 TextView textTime = replyView.findViewById(R.id.textTime);
                 ImageView btnDeleteReply = replyView.findViewById(R.id.btnDeleteReply);
                 ImageView btnEditReply = replyView.findViewById(R.id.btnEditReply);
 
+                // Đặt nội dung
                 textUser.setText(reply.getUsername() + (reply.getUserId().equals(currentUserId) ? " (Bạn)" : ""));
                 textComment.setText(reply.getComment() != null ? reply.getComment() : "");
                 textTime.setText(getTimeAgo(reply.getTimestamp()));
 
+                // Hiển thị nút chỉnh sửa và xóa nếu là chủ phản hồi
                 if (reply.getUserId().equals(currentUserId)) {
                     btnDeleteReply.setVisibility(View.VISIBLE);
                     btnEditReply.setVisibility(View.VISIBLE);
@@ -340,6 +336,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                         Toast.makeText(container.getContext(), "Phản hồi không được để trống", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
+                                    if (updatedText.length() > MAX_REPLY_LENGTH) {
+                                        Toast.makeText(container.getContext(),
+                                                "Phản hồi không được vượt quá " + MAX_REPLY_LENGTH + " ký tự",
+                                                Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
                                     Comment updatedReply = new Comment();
                                     updatedReply.setComment(updatedText);
                                     updatedReply.setUserId(reply.getUserId());
@@ -367,6 +369,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                 .setNegativeButton("Hủy", null)
                                 .show();
                     });
+                } else {
+                    btnDeleteReply.setVisibility(View.GONE);
+                    btnEditReply.setVisibility(View.GONE);
                 }
 
                 container.addView(replyView);
@@ -410,6 +415,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                             if (response.isSuccessful() && response.body() != null) {
                                 Comment newReply = response.body();
                                 holder.editReply.setText("");
+                                holder.textCharCount.setText("0/" + MAX_REPLY_LENGTH);
+                                holder.textCharCount.setTextColor(Color.parseColor("#666666"));
+                                InputMethodManager imm = (InputMethodManager) holder.itemView.getContext()
+                                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(holder.editReply.getWindowToken(), 0);
                                 repliesCache.remove(parentId);
                                 loadReplies(parentId, holder.layoutReplies);
                                 Toast.makeText(holder.itemView.getContext(), "Phản hồi đã được gửi!", Toast.LENGTH_SHORT).show();
