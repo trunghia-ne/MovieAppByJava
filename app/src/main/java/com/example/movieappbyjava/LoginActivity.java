@@ -17,6 +17,8 @@ import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -132,19 +134,30 @@ public class LoginActivity extends AppCompatActivity {
                     loginFrame.setEnabled(true);
 
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(this, MainNavigationActivity.class));
-                        finish();
+                            FirebaseFirestore.getInstance().collection("users")
+                                    .whereEqualTo("email", email)
+                                    .get()
+                                    .addOnSuccessListener(querySnapshot -> {
+                                        if (!querySnapshot.isEmpty()) {
+                                            DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                                            String role = doc.getString("role");
+                                            if ("admin".equals(role)) {
+                                                startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                                            } else {
+                                                startActivity(new Intent(LoginActivity.this, MainNavigationActivity.class));
+                                            }
+                                            finish();
+                                        } else {
+                                            Toasty.error(this, "Không tìm thấy người dùng trong Firestore.", Toasty.LENGTH_LONG, true).show();
+                                        }
+                                    });
+
                     } else {
                         Exception e = task.getException();
                         if (e instanceof FirebaseAuthInvalidUserException) {
                             Toasty.error(this, "Tài khoản không tồn tại hoặc đã bị xoá.", Toasty.LENGTH_LONG, true).show();
                         } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                            String msg = e.getMessage();
-                            if (msg != null && msg.contains("email")) {
-                                Toasty.error(this, "Email không đúng định dạng.", Toasty.LENGTH_LONG, true).show();
-                            } else {
-                                Toasty.error(this, "Tài khoản hoặc mật khẩu không đúng.", Toasty.LENGTH_LONG, true).show();
-                            }
+                            Toasty.error(this, "Tài khoản hoặc mật khẩu không đúng.", Toasty.LENGTH_LONG, true).show();
                         } else {
                             Toasty.error(this, "Đăng nhập thất bại: " + e.getLocalizedMessage(), Toasty.LENGTH_LONG, true).show();
                         }
