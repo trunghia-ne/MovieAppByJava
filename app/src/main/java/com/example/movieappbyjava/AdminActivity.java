@@ -45,6 +45,8 @@ public class AdminActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(0);
             } else if (id == R.id.nav_revenue) {
                 viewPager.setCurrentItem(1);
+            } else if (id == R.id.nav_comments) { // Thêm tab quản lý bình luận
+                viewPager.setCurrentItem(2);
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;

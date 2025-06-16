@@ -1,8 +1,6 @@
 package com.example.movieappbyjava.model;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Comment {
     private String id;           // ID trên server, dùng để update/delete
@@ -13,8 +11,8 @@ public class Comment {
     private String slug;        // Dùng slug thay movieId
     private String movieTitle;
     private String parentId;    // ID của comment cha (nếu là reply)
-    // Loại bỏ replies khỏi model, để server xử lý danh sách replies
-    private transient Date timestamp; // Không gửi lên server, server tự sinh
+    private Date timestamp; // Không gửi lên server, server tự sinh
+    private boolean hidden = false; // Thêm trường để đánh dấu bình luận bị ẩn
 
     // Constructors
     public Comment() {}
@@ -30,7 +28,7 @@ public class Comment {
     }
 
     // Dùng khi hiển thị review từ server (có timestamp và id)
-    public Comment(String id, String username, String comment, Double rating, Date timestamp, String userId, String slug, String movieTitle) {
+    public Comment(String id, String username, String comment, Double rating, Date timestamp, String userId, String slug, String movieTitle, boolean hidden) {
         this.id = id;
         this.username = username;
         this.comment = comment;
@@ -39,6 +37,7 @@ public class Comment {
         this.userId = userId;
         this.slug = slug;
         this.movieTitle = movieTitle;
+        this.hidden = hidden;
     }
 
     // Getters and setters
@@ -69,6 +68,9 @@ public class Comment {
     public String getParentId() { return parentId; }
     public void setParentId(String parentId) { this.parentId = parentId; }
 
+    public boolean isHidden() { return hidden; }
+    public void setHidden(boolean hidden) { this.hidden = hidden; }
+
     // Generate avatar URL based on username
     public String getAvatarUrl() {
         if (username != null && !username.trim().isEmpty()) {
@@ -98,6 +100,7 @@ public class Comment {
                 ", movieTitle='" + movieTitle + '\'' +
                 ", parentId='" + parentId + '\'' +
                 ", timestamp=" + timestamp +
+                ", hidden=" + hidden +
                 '}';
     }
 }
