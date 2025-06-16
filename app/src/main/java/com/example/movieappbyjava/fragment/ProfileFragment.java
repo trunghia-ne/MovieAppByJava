@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,17 +15,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.movieappbyjava.MainNavigationActivity;
 import com.example.movieappbyjava.MyAccountActivity;
-import com.example.movieappbyjava.adapter.ProfileAdapter;
 import com.example.movieappbyjava.R;
+import com.example.movieappbyjava.adapter.ProfileAdapter;
 import com.example.movieappbyjava.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileFragment extends Fragment {
+
     private TextView tvUserName;
     private TextView tvPhone;
+    private ImageView imgAvatar;
 
     private final String[] menuItems = {"My Account", "Collections", "History Watched", "Logout"};
     private final int[] icons = {
@@ -33,7 +37,6 @@ public class ProfileFragment extends Fragment {
             R.drawable.ic_movie,
             R.drawable.ic_logout
     };
-
 
     public ProfileFragment() {
     }
@@ -46,32 +49,32 @@ public class ProfileFragment extends Fragment {
 
         tvUserName = view.findViewById(R.id.tvUserName);
         tvPhone = view.findViewById(R.id.tvPhone);
-        ListView listView = view.findViewById(R.id.profileList);
+        imgAvatar = view.findViewById(R.id.imgAvatar); // Gán ID ảnh
 
+        ListView listView = view.findViewById(R.id.profileList);
         ProfileAdapter adapter = new ProfileAdapter(requireContext(), menuItems, icons);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((adapterView, itemView, position, id) -> {
-            String item = menuItems[position];
-            switch (item) {
+            switch (menuItems[position]) {
                 case "My Account":
                     startActivity(new Intent(requireContext(), MyAccountActivity.class));
                     break;
                 case "History Watched":
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.fragmentContainer, new WatchHistoryFragment()) // R.id.fragment_container là layout chứa fragment
+                            .replace(R.id.fragmentContainer, new WatchHistoryFragment())
                             .addToBackStack(null)
                             .commit();
-                    break;
-                case "Logout":
-                    FirebaseAuth.getInstance().signOut();
-                    requireActivity().finish();
                     break;
                 case "Collections":
                     if (getActivity() instanceof MainNavigationActivity) {
                         ((MainNavigationActivity) getActivity()).navigateToFavorites();
                     }
+                    break;
+                case "Logout":
+                    FirebaseAuth.getInstance().signOut();
+                    requireActivity().finish();
                     break;
             }
         });
@@ -92,21 +95,36 @@ public class ProfileFragment extends Fragment {
                         if (user != null) {
                             tvUserName.setText(user.getUsername());
                             tvPhone.setText(user.getPhone());
+
+                            // Load avatar từ Cloudinary
+                            if (user.getImage() != null && !user.getImage().isEmpty()) {
+                                Log.d("ProfileFragment", "Loading image URL: " + user.getImage());
+                                Glide.with(requireContext())
+                                        .load(user.getImage())
+                                        .circleCrop()
+                                        .placeholder(R.drawable.ic_user)
+                                        .into(imgAvatar);
+                            } else {
+                                imgAvatar.setImageResource(R.drawable.ic_user);
+                            }
+
+
                             Log.d("UserFirestore", "User loaded: " + user.getUsername());
                         }
                     } else {
-                        tvUserName.setText("Tên người dùng");
-                        tvPhone.setText("Không rõ");
-                        Toast.makeText(requireContext(), "Không tìm thấy dữ liệu người dùng!", Toast.LENGTH_SHORT).show();
-                        Log.w("UserFirestore", "Document does not exist.");
+                        showDefaultInfo("Không tìm thấy dữ liệu người dùng!");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    tvUserName.setText("Tên người dùng");
-                    tvPhone.setText("Không rõ");
-                    Toast.makeText(requireContext(), "Lỗi kết nối đến Firestore!", Toast.LENGTH_SHORT).show();
+                    showDefaultInfo("Lỗi kết nối đến Firestore!");
                     Log.e("UserFirestore", "Lỗi khi lấy dữ liệu: ", e);
                 });
     }
 
+    private void showDefaultInfo(String message) {
+        tvUserName.setText("Tên người dùng");
+        tvPhone.setText("Không rõ");
+        imgAvatar.setImageResource(R.drawable.ic_user);
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
 }
