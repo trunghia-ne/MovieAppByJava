@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -23,11 +24,10 @@ import es.dmoral.toasty.Toasty;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText edtName, edtEmail, edtPassword, edtRePassword;
-    private Button btnRegister;
+    private TextView btnRegister;
     private FirebaseAuth mAuth;
 
-
-
+    ProgressBar loginProgress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         btnRegister = findViewById(R.id.btnRegister);
         edtRePassword = findViewById(R.id.edtRePassword);
+        loginProgress = findViewById(R.id.LoginProgress);
 
         // Xử lý đăng ký khi bấm nút
         btnRegister.setOnClickListener(v -> {
@@ -93,6 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             registerUser(email, password);
+
         });
     }
 

@@ -80,10 +80,10 @@ public class HomeFragment extends Fragment {
         // Image Slider
         ImageSlider imageSlider = view.findViewById(R.id.imageSlider);
         List<SlideModel> slideModels = new ArrayList<>();
-        slideModels.add(new SlideModel("https://picsum.photos/800/400?random=1", "Hình 1", ScaleTypes.FIT));
-        slideModels.add(new SlideModel("https://picsum.photos/800/400?random=2", "Hình 2", ScaleTypes.FIT));
-        slideModels.add(new SlideModel("https://picsum.photos/800/400?random=3", "Hình 3", ScaleTypes.FIT));
-        slideModels.add(new SlideModel("https://picsum.photos/800/400?random=4", "Hình 4", ScaleTypes.FIT));
+        slideModels.add(new SlideModel("https://th.bing.com/th/id/R.5b20f7749e3029daa7a906e4416bf49d?rik=E4IeKlJbqGuQrg&pid=ImgRaw&r=0", ScaleTypes.CENTER_CROP));
+        slideModels.add(new SlideModel("https://www.vintagemovieposters.co.uk/wp-content/uploads/2021/03/IMG_1741-1536x1144.jpeg", ScaleTypes.CENTER_CROP));
+        slideModels.add(new SlideModel("https://www.slugmag.com/wp/wp-content/uploads/2017/04/screen-shot-2016-11-27-at-1-42-50-pm.png", ScaleTypes.CENTER_CROP));
+        slideModels.add(new SlideModel("https://th.bing.com/th/id/OIP.cZpUAaVR9bn1rKscWipudgHaEK?r=0&rs=1&pid=ImgDetMain",ScaleTypes.CENTER_CROP));
         imageSlider.setImageList(slideModels, ScaleTypes.FIT);
 
         // RecyclerView init

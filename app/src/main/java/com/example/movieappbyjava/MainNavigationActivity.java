@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -24,6 +27,10 @@ import com.example.movieappbyjava.fragment.FavoritesFragment;
 import com.example.movieappbyjava.fragment.HomeFragment;
 import com.example.movieappbyjava.fragment.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainNavigationActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
@@ -36,8 +43,6 @@ public class MainNavigationActivity extends AppCompatActivity {
 
     private Fragment activeFragment = homeFragment;
     private Fragment previousFragment = null; // dùng cho quay lại từ category, favorites...
-    private final String avatarUrl = "https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg";
-
 
     @Override
     public void onBackPressed() {
@@ -82,22 +87,50 @@ public class MainNavigationActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Load avatar vào nút profile
-        Glide.with(this)
-                .asBitmap()
-                .load(avatarUrl)
-                .override(dpToPx(24), dpToPx(24))
-                .circleCrop()
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        Drawable circularDrawable = new BitmapDrawable(getResources(), resource);
-                        bottomNavigationView.getMenu().findItem(R.id.nav_profile).setIcon(circularDrawable);
-                    }
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {}
-                });
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(uid).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String imageUrl = documentSnapshot.getString("image");
+                            Log.d("MainNav", "UID = " + uid);
+                            Log.d("MainNav", "imageUrl = " + imageUrl);
+                            if (imageUrl != null && !imageUrl.isEmpty()) {
+                                Glide.with(this)
+                                        .asBitmap()
+                                        .load(imageUrl)
+                                        .override(dpToPx(24), dpToPx(24))
+                                        .circleCrop()
+                                        .into(new CustomTarget<Bitmap>() {
+                                            @Override
+                                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                                // Tạo ImageSpan từ Bitmap
+                                                Drawable d = new BitmapDrawable(getResources(), resource);
+                                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                                ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BOTTOM);
+
+                                                SpannableString sb = new SpannableString(" ");
+                                                sb.setSpan(span, 0, 1, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                                bottomNavigationView.getMenu().findItem(R.id.nav_profile).setTitle(sb);
+                                                Log.d("MainNav", "Avatar set as title successfully");
+                                            }
+
+                                            @Override
+                                            public void onLoadCleared(@Nullable Drawable placeholder) {}
+                                        });
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // fallback nếu lỗi xảy ra
+                        e.printStackTrace();
+                    });
+        }
+
 
         // Add tất cả fragment 1 lần duy nhất
         getSupportFragmentManager().beginTransaction()
