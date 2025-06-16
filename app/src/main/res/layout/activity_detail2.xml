@@ -199,7 +199,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Đánh giá phim"
+                    android:text="Review"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#FFD700"
@@ -208,7 +208,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chọn sao đánh giá"
+                    android:text="Chọn số sao để đánh giá "
                     android:textColor="#EEE"
                     android:textSize="14sp"
                     android:layout_marginBottom="4dp" />
@@ -234,7 +234,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Điểm"
+                        android:text="Score"
                         android:textColor="#AAA"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -243,7 +243,7 @@
                         android:id="@+id/textRatingStats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chưa có đánh giá"
+                        android:text="No yet reviews"
                         android:textColor="#DDD"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -253,15 +253,16 @@
                     android:id="@+id/editComment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Viết bình luận của bạn..."
-                    android:background="#fff"
+                    android:hint="Your reviews..."
                     android:textColor="#070707"
                     app:hintTextColor="#070707"
                     android:padding="12dp"
+                    android:background="@drawable/edittext_background"
                     android:minHeight="100dp"
                     android:gravity="top"
                     android:layout_marginBottom="12dp"
                     android:textSize="14sp" />
+
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnSubmitRating"
@@ -289,7 +290,7 @@
                     android:id="@+id/textCommentsHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bình luận (0)"
+                    android:text="Reviews (0)"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#FFD700"

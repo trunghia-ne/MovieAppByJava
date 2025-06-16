@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.movieappbyjava.R;
 import com.example.movieappbyjava.adapter.MovieAdapter;
 import com.example.movieappbyjava.model.ApiClient;
+import com.example.movieappbyjava.model.ApiResponseMessage;
 import com.example.movieappbyjava.model.Movie;
 
 import java.util.ArrayList;
@@ -80,6 +81,7 @@ public class FilmCollection extends Fragment {
         rvMovies.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         adapter = new MovieAdapter(movieList);
+        adapter.setOnMovieLongClickListener(movie -> showDeleteMovieDialog(movie));
         rvMovies.setAdapter(adapter);
 
         // Hiển thị tên bộ sưu tập lên UI
@@ -110,6 +112,34 @@ public class FilmCollection extends Fragment {
                         Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void showDeleteMovieDialog(Movie movie) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Xoá phim")
+                .setMessage("Bạn có chắc muốn xoá \"" + movie.getName() + "\" khỏi bộ sưu tập?")
+                .setPositiveButton("Xoá", (dialog, which) -> {
+                    ApiClient.getApiService()
+                            .deleteFilmFromCollection(collectionId, movie.getSlug())
+                            .enqueue(new Callback<ApiResponseMessage>() {
+                                @Override
+                                public void onResponse(Call<ApiResponseMessage> call, Response<ApiResponseMessage> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                        loadMovies(); // refresh lại danh sách
+                                    } else {
+                                        Toast.makeText(getContext(), "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ApiResponseMessage> call, Throwable t) {
+                                    Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }
 

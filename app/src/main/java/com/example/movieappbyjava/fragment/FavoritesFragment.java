@@ -60,15 +60,24 @@ public class FavoritesFragment extends Fragment {
         fabAdd = view.findViewById(R.id.fabAddCollection);
         rvCollections.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new CollectionAdapter(getContext(), collectionList, collection -> {
-            FilmCollection fragment = FilmCollection.newInstance(collection.getId(), collection.getCollection_name());
+        adapter = new CollectionAdapter(getContext(), collectionList, new CollectionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(CollectionFilm collection) {
+                FilmCollection fragment = FilmCollection.newInstance(collection.getId(), collection.getCollection_name());
 
-            ((AppCompatActivity) requireActivity()).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    .addToBackStack(null)
-                    .commit();
+                ((AppCompatActivity) requireActivity()).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+
+            @Override
+            public void onItemLongClick(CollectionFilm collection) {
+                showDeleteDialog(collection);  // ✅ gọi xác nhận xóa
+            }
         });
+
 
         rvCollections.setAdapter(adapter);
 
@@ -184,5 +193,36 @@ public class FavoritesFragment extends Fragment {
                     }
                 });
     }
+
+    private void showDeleteDialog(CollectionFilm collection) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Xóa bộ sưu tập")
+                .setMessage("Bạn có chắc chắn muốn xóa \"" + collection.getCollection_name() + "\"?")
+                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    ApiClient.getApiService().deleteCollection(collection.getId())
+                            .enqueue(new Callback<ApiResponseMessage>() {
+                                @Override
+                                public void onResponse(Call<ApiResponseMessage> call, Response<ApiResponseMessage> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                        if (currentUser != null) {
+                                            loadCollectionsFromApi(currentUser.getUid());
+                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), "Xóa thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ApiResponseMessage> call, Throwable t) {
+                                    Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                })
+                .show();
+    }
+
 }
 

@@ -14,17 +14,17 @@ public interface KKPhimApi {
     Call<ApiResponse> getLatestMovies(@Query("page") int page);
 
     @GET("v1/api/danh-sach/phim-le")
-    Call<ApiResponsePhim> getSingleMovies();
+    Call<ApiResponsePhim> getSingleMovies(@Query("page") int page);
 
     @GET("v1/api/danh-sach/phim-bo")
-    Call<ApiResponsePhim> getSeriasMovies();
+    Call<ApiResponsePhim> getSeriasMovies(@Query("page") int page);
 
     @GET("v1/api/danh-sach/hoat-hinh")
-    Call<ApiResponsePhim> getAnimeMovies();
-
+    Call<ApiResponsePhim> getAnimeMovies(@Query("page") int page);
 
     @GET("v1/api/danh-sach/tv-shows")
-    Call<ApiResponsePhim> getTvShowMovies();
+    Call<ApiResponsePhim> getTvShowMovies(@Query("page") int page);
+
 
     @GET("phim/{slug}")
     Call<MovieDetailResponse> getMovieDetail(@Path("slug") String slug);

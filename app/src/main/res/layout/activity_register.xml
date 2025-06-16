@@ -104,6 +104,7 @@
                 android:textColor="#000000"
                 android:layout_marginTop="16dp" />
 
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -112,25 +113,67 @@
                 <EditText
                     android:id="@+id/edtPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="48dp"
                     android:hint="Your password"
                     android:inputType="textPassword"
-                    android:background="@android:color/transparent"
                     android:paddingHorizontal="16dp"
                     android:textColor="#000000"
                     android:textSize="14sp"
                     android:textColorHint="#999999"
-                    android:layout_alignParentStart="true"
-                    android:layout_toStartOf="@id/togglePass" />
+                    android:background="@drawable/bg_edittext" />
 
                 <ImageView
-                    android:id="@+id/togglePass"
+                    android:id="@+id/togglePassword"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="12dp"
-                    android:contentDescription="Toggle password visibility" />
+                    android:src="@drawable/ic_eye_closed"
+                    android:contentDescription="Toggle password visibility"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RePassword"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:textColor="#000000"
+                android:layout_marginTop="16dp" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_edittext">
+
+                <EditText
+                    android:id="@+id/edtRePassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Your rePassword"
+                    android:inputType="textPassword"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#000000"
+                    android:textSize="14sp"
+                    android:textColorHint="#999999"
+                    android:background="@drawable/bg_edittext" />
+
+                <ImageView
+                    android:id="@+id/toggleRePassword"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_eye_closed"
+                    android:contentDescription="Toggle password visibility"
+                    android:clickable="true"
+                    android:focusable="true" />
             </RelativeLayout>
 
             <!-- Register Button -->

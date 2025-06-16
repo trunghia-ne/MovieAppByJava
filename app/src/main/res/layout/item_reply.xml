@@ -1,0 +1,86 @@
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Dòng chứa nút chỉnh sửa và xóa -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <!-- Edit button -->
+            <ImageView
+                android:id="@+id/btnEditReply"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_edit"
+                android:padding="4dp"
+                android:contentDescription="Edit Reply"
+                android:visibility="gone" />
+
+            <!-- Delete button -->
+            <ImageView
+                android:id="@+id/btnDeleteReply"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_delete"
+                android:padding="4dp"
+                android:contentDescription="Delete Reply"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Dòng chứa thông tin người dùng và nội dung phản hồi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Username -->
+            <TextView
+                android:id="@+id/textUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Comment content -->
+            <TextView
+                android:id="@+id/textComment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="#666"
+                android:paddingStart="8dp"
+                android:maxLines="10"
+            android:ellipsize="none"
+            android:scrollbars="vertical"
+            android:overScrollMode="ifContentScrolls" />
+
+            <!-- Timestamp -->
+            <TextView
+                android:id="@+id/textTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

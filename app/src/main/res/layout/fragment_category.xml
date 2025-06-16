@@ -1,14 +1,234 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/main_color"
     tools:context=".fragment.CategoryFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Giao diện chọn thể loại -->
+    <LinearLayout
+        android:id="@+id/category_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical">
 
+        <!-- Tiêu đề + nút quay lại -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Back"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/title_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
+
+        <!-- Grid layout các thể loại phim -->
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:alignmentMode="alignMargins"
+            android:rowOrderPreserved="false">
+
+            <!-- Copy lại các thẻ Phim Lẻ, Phim Bộ, Anime, TV Show từ layout bạn có -->
+
+            <!-- Phim Lẻ -->
+            <LinearLayout
+                android:id="@+id/card_phim_le"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:layout_margin="8dp"
+                android:background="@drawable/category_card_bg">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img_phim_le"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/phimle"
+                        android:contentDescription="Phim Lẻ" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/text_gradient" />
+
+                    <TextView
+                        android:id="@+id/text_phim_le"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Phim Lẻ"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:layout_gravity="bottom" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Phim Bộ -->
+            <LinearLayout
+                android:id="@+id/card_phim_bo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:layout_margin="8dp"
+                android:background="@drawable/category_card_bg">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img_phim_bo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/phimbo"
+                        android:contentDescription="Phim Bộ" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/text_gradient" />
+
+                    <TextView
+                        android:id="@+id/text_phim_bo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Phim Bộ"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:layout_gravity="bottom" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Anime -->
+            <LinearLayout
+                android:id="@+id/card_phim_anime"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:layout_margin="8dp"
+                android:background="@drawable/category_card_bg">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img_anime"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/anime"
+                        android:contentDescription="Anime" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/text_gradient" />
+
+                    <TextView
+                        android:id="@+id/text_anime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Anime"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:layout_gravity="bottom" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- TV Shows -->
+            <LinearLayout
+                android:id="@+id/card_tvshows"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:orientation="vertical"
+                android:layout_margin="8dp"
+                android:background="@drawable/category_card_bg">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img_tvshows"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/tvshow"
+                        android:contentDescription="TV Shows" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/text_gradient" />
+
+                    <TextView
+                        android:id="@+id/text_tvshows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TV Shows"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:layout_gravity="bottom" />
+                </FrameLayout>
+            </LinearLayout>
+
+        </GridLayout>
+    </LinearLayout>
+
+    <!-- Fragment con CateMovie sẽ hiển thị ở đây khi click -->
+    <FrameLayout
+        android:id="@+id/nestedFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </FrameLayout>
