@@ -6,9 +6,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.movieappbyjava.fragment.RevenueManagementFragment;
 import com.example.movieappbyjava.fragment.UserManagementFragment;
+import com.example.movieappbyjava.fragment.CommentManagementFragment; // Tạo mới fragment này
 
 import androidx.annotation.NonNull;
-
 
 public class AdminViewPagerAdapter extends FragmentStateAdapter {
 
@@ -24,6 +24,8 @@ public class AdminViewPagerAdapter extends FragmentStateAdapter {
                 return new UserManagementFragment();
             case 1:
                 return new RevenueManagementFragment();
+            case 2:
+                return new CommentManagementFragment(); // Thêm fragment quản lý bình luận
             default:
                 return new UserManagementFragment();
         }
@@ -31,6 +33,6 @@ public class AdminViewPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 2;
+        return 3; // Tăng lên 3 tab
     }
 }

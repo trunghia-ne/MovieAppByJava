@@ -79,4 +79,10 @@ public interface ApiService {
             @Query("collectionId") String collectionId,
             @Query("slug") String slug
     );
+    @PUT("api/reviews/{reviewId}/hide")
+    Call<Void> hideComment(@Path("reviewId") String reviewId);
+    @PUT("api/reviews/{reviewId}/show")
+    Call<Void> showComment(@Path("reviewId") String reviewId);
+    @GET("api/reviews/all")
+    Call<List<Comment>> getAllComments();
 }
