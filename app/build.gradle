@@ -72,6 +72,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:22.3.0' // bản mới nhất
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
 
+    // Cloudinary
+    implementation 'com.cloudinary:cloudinary-android:2.3.1'
+
+
     // Các thư viện Firebase khác nếu cần
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-firestore:24.7.1'

@@ -18,6 +18,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.movieappbyjava.model.User;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -25,8 +27,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyAccountActivity extends AppCompatActivity {
 
@@ -38,10 +45,8 @@ public class MyAccountActivity extends AppCompatActivity {
 
     private String userId;
     private FirebaseFirestore firestore;
-    private StorageReference storageReference;
     private Uri avatarUri;
 
-    // Launcher cho chọn ảnh từ thư viện và từ file manager (ổ đĩa)
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -53,7 +58,6 @@ public class MyAccountActivity extends AppCompatActivity {
                 }
             });
 
-    // Launcher cho chụp ảnh từ camera (lấy ảnh dạng Bitmap)
     private final ActivityResultLauncher<Intent> captureImageLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -61,12 +65,8 @@ public class MyAccountActivity extends AppCompatActivity {
                     if (extras != null) {
                         Bitmap imageBitmap = (Bitmap) extras.get("data");
                         if (imageBitmap != null) {
-                            // Lưu Bitmap tạm thời và chuyển thành Uri nếu cần upload
                             avatarImageView.setImageBitmap(imageBitmap);
-                            // Chú ý: Bạn cần lưu bitmap thành file để có Uri, nếu upload lên Firebase
-                            // Ở đây tạm chưa xử lý chuyển Bitmap -> Uri
-                            // Bạn có thể bổ sung phương thức saveBitmapToFile() nếu cần
-                            avatarUri = null; // Đặt null để tránh upload sai
+                            avatarUri = null; // Nếu dùng ảnh từ camera, cần thêm logic lưu file tạm rồi lấy Uri
                         }
                     }
                 }
@@ -88,7 +88,6 @@ public class MyAccountActivity extends AppCompatActivity {
         changePasswordButton = findViewById(R.id.changePasswordButton);
 
         firestore = FirebaseFirestore.getInstance();
-        storageReference = FirebaseStorage.getInstance().getReference();
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -148,7 +147,6 @@ public class MyAccountActivity extends AppCompatActivity {
         pickImageLauncher.launch(Intent.createChooser(intent, "Chọn ảnh từ thiết bị"));
     }
 
-
     private void fetchUserData(String userId) {
         DocumentReference docRef = firestore.collection("users").document(userId);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -183,7 +181,7 @@ public class MyAccountActivity extends AppCompatActivity {
         String phone = phoneEditText.getText().toString().trim();
 
         if (avatarUri != null) {
-            uploadImageToFirebase(avatarUri, new UploadCallback() {
+            uploadImageToCloudinary(avatarUri, new UploadCallback() {
                 @Override
                 public void onUploadSuccess(String downloadUrl) {
                     updateUserInfo(name, email, phone, downloadUrl);
@@ -195,7 +193,6 @@ public class MyAccountActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Nếu avatarUri null thì vẫn cập nhật thông tin, giữ ảnh cũ
             updateUserInfo(name, email, phone, null);
         }
     }
@@ -215,22 +212,54 @@ public class MyAccountActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(MyAccountActivity.this, "Cập nhật thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void uploadImageToFirebase(Uri imageUri, UploadCallback callback) {
-        if (imageUri == null) {
-            callback.onUploadFailure("Uri ảnh rỗng");
-            return;
+    private void uploadImageToCloudinary(Uri imageUri, UploadCallback callback) {
+        try {
+            File file = uriToFile(imageUri);
+            if (file == null) {
+                callback.onUploadFailure("Không thể chuyển đổi ảnh thành File");
+                return;
+            }
+
+            new Thread(() -> {
+                try {
+                    Map config = new HashMap();
+                    config.put("cloud_name", "ddrqfuaji");  // <-- Thay bằng cloud_name của bạn
+                    config.put("api_key", "Root");        // <-- Thay bằng api_key của bạn
+                    config.put("api_secret", "BE2OLRq9PSwXEg7RnjAqnCOQtBM");  // <-- Không nên dùng secret trong app public
+
+                    Cloudinary cloudinary = new Cloudinary(config);
+                    Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+                    String imageUrl = uploadResult.get("secure_url").toString();
+
+                    runOnUiThread(() -> callback.onUploadSuccess(imageUrl));
+                } catch (Exception e) {
+                    runOnUiThread(() -> callback.onUploadFailure("Lỗi upload: " + e.getMessage()));
+                }
+            }).start();
+
+        } catch (Exception e) {
+            callback.onUploadFailure("Lỗi: " + e.getMessage());
         }
-        StorageReference fileRef = storageReference.child("avatars/" + userId + ".jpg");
-        fileRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    callback.onUploadSuccess(uri.toString());
-                }))
-                .addOnFailureListener(e -> callback.onUploadFailure(e.getMessage()));
+    }
+
+    private File uriToFile(Uri uri) throws Exception {
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        File tempFile = File.createTempFile("avatar", ".jpg", getCacheDir());
+        tempFile.deleteOnExit();
+
+        try (OutputStream outputStream = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+
+        return tempFile;
     }
 
     private interface UploadCallback {
         void onUploadSuccess(String downloadUrl);
-
         void onUploadFailure(String errorMessage);
     }
 
