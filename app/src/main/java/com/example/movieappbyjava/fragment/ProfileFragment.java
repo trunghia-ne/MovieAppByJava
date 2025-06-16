@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.movieappbyjava.LoginActivity;
 import com.example.movieappbyjava.MainNavigationActivity;
 import com.example.movieappbyjava.MyAccountActivity;
 import com.example.movieappbyjava.R;
@@ -74,7 +75,9 @@ public class ProfileFragment extends Fragment {
                     break;
                 case "Logout":
                     FirebaseAuth.getInstance().signOut();
-                    requireActivity().finish();
+                    Intent intent = new Intent(requireContext(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xoá toàn bộ backstack
+                    startActivity(intent);
                     break;
             }
         });

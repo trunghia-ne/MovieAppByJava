@@ -14,7 +14,7 @@
         android:title="Favorite" />
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_placeholder"
+        android:icon="@null"
         android:title="Profile" />
 </menu>
 
