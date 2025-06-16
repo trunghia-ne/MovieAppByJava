@@ -4,6 +4,7 @@ import com.example.movieappbyjava.model.ApiResponseMessage;
 import com.example.movieappbyjava.model.CollectionFilm;
 import com.example.movieappbyjava.model.Comment;
 import com.example.movieappbyjava.model.Movie;
+import com.example.movieappbyjava.model.Payment;
 import com.example.movieappbyjava.model.PaymentUrlResponse;
 
 import java.util.List;
@@ -21,6 +22,12 @@ import retrofit2.http.Query;
 public interface ApiService {
     @POST("/api/pay")
     Call<PaymentUrlResponse> createPayment(@Query("amount") int amount, @Query("userId") String userId);
+
+    @GET("api/revenue")
+    Call<List<Payment>> getPayments();
+
+    @GET("api/revenue/total")
+    Call<Long> getTotalRevenue();
 
     @GET("api/reviews/{slug}")
     Call<List<Comment>> getReviews(@Path("slug") String slug);

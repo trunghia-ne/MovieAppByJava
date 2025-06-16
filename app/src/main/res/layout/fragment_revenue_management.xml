@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:background="#F5F5F5">
 
+    <!-- Tổng doanh thu -->
     <TextView
-        android:id="@+id/totalRevenueText"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_total_revenue"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tổng doanh thu: 0đ"
+        android:text="Tổng doanh thu: 0 VNĐ"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:padding="16dp"
+        android:background="@drawable/bg_item_payment"
         android:layout_marginBottom="16dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/revenueRecyclerView"
+    <SearchView
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:queryHint="Tìm theo user ID hoặc phương thức..." />
+
+
+    <!-- Bảng doanh thu -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_revenue_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:padding="8dp"
+        android:scrollbars="vertical" />
+
 </LinearLayout>
