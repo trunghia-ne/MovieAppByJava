@@ -1,9 +1,12 @@
 package com.example.movieappbyjava.fragment;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +24,7 @@ import com.example.movieappbyjava.model.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; // Thêm import này
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,8 +35,10 @@ public class CommentManagementFragment extends Fragment implements AdminCommentA
     private RecyclerView recyclerComments;
     private AdminCommentAdapter commentAdapter;
     private List<Comment> commentsList = new ArrayList<>();
+    private List<Comment> filteredCommentsList = new ArrayList<>();
     private ProgressBar progressBarLoading;
     private TextView textCommentsHeader;
+    private EditText editTextFilter;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,11 +47,26 @@ public class CommentManagementFragment extends Fragment implements AdminCommentA
         recyclerComments = view.findViewById(R.id.recyclerAdminComments);
         progressBarLoading = view.findViewById(R.id.progressBarLoading);
         textCommentsHeader = view.findViewById(R.id.textCommentsHeader);
+        editTextFilter = view.findViewById(R.id.editTextFilter);
 
         // Configure RecyclerView
         recyclerComments.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentAdapter = new AdminCommentAdapter(commentsList, this);
+        commentAdapter = new AdminCommentAdapter(filteredCommentsList, this);
         recyclerComments.setAdapter(commentAdapter);
+
+        // Add filter listener
+        editTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterComments(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         loadComments();
 
@@ -61,8 +82,7 @@ public class CommentManagementFragment extends Fragment implements AdminCommentA
                 if (response.isSuccessful() && response.body() != null) {
                     commentsList.clear();
                     commentsList.addAll(response.body());
-                    commentAdapter.notifyDataSetChanged();
-                    textCommentsHeader.setText("Quản lý bình luận (" + commentsList.size() + ")");
+                    filterComments(editTextFilter.getText().toString()); // Lọc ngay sau khi tải
                 } else {
                     Toast.makeText(getContext(), "Lỗi tải bình luận", Toast.LENGTH_SHORT).show();
                 }
@@ -74,6 +94,22 @@ public class CommentManagementFragment extends Fragment implements AdminCommentA
                 Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void filterComments(String query) {
+        filteredCommentsList.clear();
+        if (query.isEmpty()) {
+            filteredCommentsList.addAll(commentsList.stream()
+                    .filter(comment -> !comment.isHidden()) // Chỉ lấy bình luận không bị ẩn
+                    .collect(Collectors.toList())); // Thay toList() bằng collect(Collectors.toList())
+        } else {
+            String lowerCaseQuery = query.toLowerCase();
+            filteredCommentsList.addAll(commentsList.stream()
+                    .filter(comment -> !comment.isHidden() && comment.getMovieTitle().toLowerCase().contains(lowerCaseQuery))
+                    .collect(Collectors.toList())); // Thay toList() bằng collect(Collectors.toList())
+        }
+        commentAdapter.notifyDataSetChanged();
+        textCommentsHeader.setText("Quản lý bình luận (" + filteredCommentsList.size() + ")");
     }
 
     @Override
@@ -90,9 +126,9 @@ public class CommentManagementFragment extends Fragment implements AdminCommentA
                             progressBarLoading.setVisibility(View.GONE);
                             if (response.isSuccessful()) {
                                 Toast.makeText(getContext(), "Bình luận đã được " + (isHidden ? "hiện" : "ẩn"), Toast.LENGTH_SHORT).show();
-                                loadComments();
+                                loadComments(); // Tải lại để cập nhật
                             } else {
-                                Toast.makeText(getContext(), "Lỗi khi " + (isHidden ? "hiện" : "ẩn") + " bình luận", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Lỗi khi " + (isHidden ? "hiện" : "ẩn") + " bình luận: " + response.code(), Toast.LENGTH_SHORT).show();
                             }
                         }
 

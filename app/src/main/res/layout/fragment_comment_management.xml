@@ -9,18 +9,29 @@
         android:id="@+id/textCommentsHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quản lý bình luận"
+        android:text="Quản lý Đánh giá và Bình luận"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="16dp"/>
 
+    <EditText
+        android:id="@+id/editTextFilter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Lọc theo tên phim"
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@id/textCommentsHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAdminComments"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/textCommentsHeader"
+        app:layout_constraintTop_toBottomOf="@id/editTextFilter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

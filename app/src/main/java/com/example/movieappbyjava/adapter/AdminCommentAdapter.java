@@ -41,8 +41,15 @@ public class AdminCommentAdapter extends RecyclerView.Adapter<AdminCommentAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Comment comment = comments.get(position);
+        if (comment.isHidden()) {
+            holder.itemView.setVisibility(View.GONE);
+            return;
+        }
+        holder.itemView.setVisibility(View.VISIBLE);
+
         holder.textUser.setText(comment.getUsername());
         holder.textComment.setText(comment.getComment());
+        holder.textMovieTitle.setText(comment.getMovieTitle());
 
         // Format timestamp
         if (comment.getTimestamp() != null) {
@@ -59,6 +66,8 @@ public class AdminCommentAdapter extends RecyclerView.Adapter<AdminCommentAdapte
         holder.ratingBar.setRating(comment.getRating() != null ? comment.getRating().floatValue() : 0f);
         Glide.with(holder.itemView.getContext())
                 .load(comment.getAvatarUrl())
+                .placeholder(R.drawable.ic_placeholder) // Placeholder khi tải ảnh
+                .error(R.drawable.ic_error) // Hiển thị khi tải lỗi
                 .into(holder.imageAvatar);
 
         // Update button state based on hidden status
@@ -66,9 +75,6 @@ public class AdminCommentAdapter extends RecyclerView.Adapter<AdminCommentAdapte
         holder.btnToggleHide.setText(isHidden ? "Hiện" : "Ẩn");
         holder.btnToggleHide.setBackgroundTintList(holder.itemView.getContext().getResources().getColorStateList(
                 isHidden ? R.color.orange : R.color.purple));
-
-        // Gray out hidden comments for visual feedback
-        holder.itemView.setAlpha(isHidden ? 0.5f : 1.0f);
 
         holder.btnToggleHide.setOnClickListener(v -> toggleHideClickListener.onToggleHideClick(comment.getId(), isHidden));
     }
@@ -80,7 +86,7 @@ public class AdminCommentAdapter extends RecyclerView.Adapter<AdminCommentAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageAvatar;
-        TextView textUser, textComment, textTime;
+        TextView textUser, textComment, textTime, textMovieTitle;
         Button btnToggleHide;
         android.widget.RatingBar ratingBar;
 
@@ -90,6 +96,7 @@ public class AdminCommentAdapter extends RecyclerView.Adapter<AdminCommentAdapte
             textUser = itemView.findViewById(R.id.textUser);
             textComment = itemView.findViewById(R.id.textComment);
             textTime = itemView.findViewById(R.id.textTime);
+            textMovieTitle = itemView.findViewById(R.id.textMovieTitle);
             btnToggleHide = itemView.findViewById(R.id.btnToggleHide);
             ratingBar = itemView.findViewById(R.id.ratingUser);
         }
