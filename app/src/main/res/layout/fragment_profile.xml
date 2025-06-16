@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".fragment.ProfileFragment">
 
     <!-- Nội dung có thể cuộn -->
     <ScrollView
@@ -48,10 +48,16 @@
                 android:layout_marginTop="8dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
                     android:layout_marginEnd="12dp"
-                    android:src="@drawable/ic_user" />
+                    android:src="@drawable/ic_user"
+                    android:contentDescription="Avatar người dùng"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/ic_user"
+                    android:padding="2dp" />
+
 
                 <LinearLayout
                     android:layout_width="0dp"
